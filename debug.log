@@ -1,0 +1,368 @@
+2026-02-12T17:20:52.583Z [console][warn] Image with src "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/ac7698f2-a38b-41d3-98e1-66161d9459d0-gomega-ai/assets/images/5VENvE7QayIR6KIN2C7ZF1RC0-7.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+2026-02-12T17:20:52.585Z [console][warn] Image with src "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/ac7698f2-a38b-41d3-98e1-66161d9459d0-gomega-ai/assets/images/L6PyxBMtXtG0IxL6LzcdEyH8w-4.jpg" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+2026-02-12T17:20:52.586Z [console][warn] Image with src "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/ac7698f2-a38b-41d3-98e1-66161d9459d0-gomega-ai/assets/images/vLFxC1dqXn6m05QLJGbOBRkmqQ-8.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+2026-02-12T17:20:52.586Z [console][warn] Image with src "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/ac7698f2-a38b-41d3-98e1-66161d9459d0-gomega-ai/assets/images/XLo32iXKmxabiDAiD5AyFDsFQ0-9.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+2026-02-12T17:20:52.586Z [console][warn] Image with src "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/ac7698f2-a38b-41d3-98e1-66161d9459d0-gomega-ai/assets/images/SJ1nECtIH4aeU2BYb1MU1VA9Kw-10.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+2026-02-12T17:20:52.587Z [console][warn] Image with src "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/ac7698f2-a38b-41d3-98e1-66161d9459d0-gomega-ai/assets/images/ITg464Di5D4euyvonHD2LHQVw-11.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+2026-02-19T20:18:43.441Z [console][warn] Image with src "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/ac7698f2-a38b-41d3-98e1-66161d9459d0-gomega-ai/assets/images/mFQ0E3AmctyJVKzjtQwtIslnFlA-2.png" has "fill" and a height value of 0. This is likely because the parent element of the image has not been styled to have a set height.
+2026-02-19T20:18:43.441Z [console][warn] Image with src "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/ac7698f2-a38b-41d3-98e1-66161d9459d0-gomega-ai/assets/images/eYi2k6neqm70FW2rnCYlmcUZ354-3.png" has "fill" and a height value of 0. This is likely because the parent element of the image has not been styled to have a set height.
+2026-02-19T20:18:43.442Z [console][warn] Image with src "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/ac7698f2-a38b-41d3-98e1-66161d9459d0-gomega-ai/assets/images/a0ZecmApvb584aLiqRNEGULvDo-5.png" has "fill" and a height value of 0. This is likely because the parent element of the image has not been styled to have a set height.
+2026-02-23T21:01:42.934Z [console][warn] Image with src "/superbase-logo.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+2026-02-25T19:32:25.508Z [console][error] ./user/app/src/app/app/page.tsx
+Error evaluating Node.js code
+SyntaxError: Unexpected token, expected ":" (2120:143)
+    [at toParseError (/home/user/app/node_modules/@babel/parser/src/parse-error.ts:95:45)]
+    [at TypeScriptParserMixin.raise (/home/user/app/node_modules/@babel/parser/src/tokenizer/index.ts:1507:19)]
+    [at TypeScriptParserMixin.unexpected (/home/user/app/node_modules/@babel/parser/src/tokenizer/index.ts:1547:16)]
+    [at TypeScriptParserMixin.expect (/home/user/app/node_modules/@babel/parser/src/parser/util.ts:157:12)]
+    [at TypeScriptParserMixin.parseConditional (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:404:12)]
+    [at TypeScriptParserMixin.parseConditional (/home/user/app/node_modules/@babel/parser/src/plugins/typescript/index.ts:3396:20)]
+    [at TypeScriptParserMixin.parseMaybeConditional (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:390:17)]
+    [at TypeScriptParserMixin.parseMaybeAssign (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:301:21)]
+    [at TypeScriptParserMixin.parseMaybeAssign (/home/user/app/node_modules/@babel/parser/src/plugins/typescript/index.ts:3747:22)]
+    [at <anonymous> (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:257:12)]
+
+Import traces:
+  Client Component Browser:
+    ./user/app/src/app/app/page.tsx [Client Component Browser]
+    ./user/app/src/app/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./user/app/src/app/app/page.tsx [Client Component SSR]
+    ./user/app/src/app/app/page.tsx [Server Component]
+2026-02-25T19:32:25.508Z [console][error] ./user/app/src/app/app/page.tsx:2120:144
+Parsing ecmascript source code failed
+  2118 |             <div className="flex items-center gap-3 shrink-0">
+  2119 |               <span style={{ opacity: 0.45 }}>{row.vol}/mo</span>
+> 2120 |               <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: row.intent === "High" ? "#DCFCE7" , color: row.intent === "High" ? "#15803D" : "#92400E" }}>
+       |                                                                                                                                                ^
+  2121 |                 {row.intent}
+  2122 |               </span>
+  2123 |             </div>
+
+Expected '</', got ','
+
+Import traces:
+  Client Component Browser:
+    ./user/app/src/app/app/page.tsx [Client Component Browser]
+    ./user/app/src/app/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./user/app/src/app/app/page.tsx [Client Component SSR]
+    ./user/app/src/app/app/page.tsx [Server Component]
+2026-02-25T19:33:06.168Z [console][error] ./user/app/src/app/app/page.tsx
+Error evaluating Node.js code
+SyntaxError: Unexpected token, expected ":" (2025:143)
+    [at toParseError (/home/user/app/node_modules/@babel/parser/src/parse-error.ts:95:45)]
+    [at TypeScriptParserMixin.raise (/home/user/app/node_modules/@babel/parser/src/tokenizer/index.ts:1507:19)]
+    [at TypeScriptParserMixin.unexpected (/home/user/app/node_modules/@babel/parser/src/tokenizer/index.ts:1547:16)]
+    [at TypeScriptParserMixin.expect (/home/user/app/node_modules/@babel/parser/src/parser/util.ts:157:12)]
+    [at TypeScriptParserMixin.parseConditional (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:404:12)]
+    [at TypeScriptParserMixin.parseConditional (/home/user/app/node_modules/@babel/parser/src/plugins/typescript/index.ts:3396:20)]
+    [at TypeScriptParserMixin.parseMaybeConditional (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:390:17)]
+    [at TypeScriptParserMixin.parseMaybeAssign (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:301:21)]
+    [at TypeScriptParserMixin.parseMaybeAssign (/home/user/app/node_modules/@babel/parser/src/plugins/typescript/index.ts:3747:22)]
+    [at <anonymous> (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:257:12)]
+
+Import traces:
+  Client Component Browser:
+    ./user/app/src/app/app/page.tsx [Client Component Browser]
+    ./user/app/src/app/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./user/app/src/app/app/page.tsx [Client Component SSR]
+    ./user/app/src/app/app/page.tsx [Server Component]
+2026-02-25T19:33:06.168Z [console][error] ./user/app/src/app/app/page.tsx:2025:144
+Parsing ecmascript source code failed
+  2023 |             <div className="flex items-center gap-3 shrink-0">
+  2024 |               <span style={{ opacity: 0.45 }}>{row.vol}/mo</span>
+> 2025 |               <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: row.intent === "High" ? "#DCFCE7" , color: row.intent === "High" ? "#15803D" : "#92400E" }}>
+       |                                                                                                                                                ^
+  2026 |                 {row.intent}
+  2027 |               </span>
+  2028 |             </div>
+
+Expected '</', got ','
+
+Import traces:
+  Client Component Browser:
+    ./user/app/src/app/app/page.tsx [Client Component Browser]
+    ./user/app/src/app/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./user/app/src/app/app/page.tsx [Client Component SSR]
+    ./user/app/src/app/app/page.tsx [Server Component]
+2026-02-25T19:33:16.515Z [console][error] ./user/app/src/app/app/page.tsx
+Error evaluating Node.js code
+SyntaxError: Unexpected token, expected ":" (2024:143)
+    [at toParseError (/home/user/app/node_modules/@babel/parser/src/parse-error.ts:95:45)]
+    [at TypeScriptParserMixin.raise (/home/user/app/node_modules/@babel/parser/src/tokenizer/index.ts:1507:19)]
+    [at TypeScriptParserMixin.unexpected (/home/user/app/node_modules/@babel/parser/src/tokenizer/index.ts:1547:16)]
+    [at TypeScriptParserMixin.expect (/home/user/app/node_modules/@babel/parser/src/parser/util.ts:157:12)]
+    [at TypeScriptParserMixin.parseConditional (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:404:12)]
+    [at TypeScriptParserMixin.parseConditional (/home/user/app/node_modules/@babel/parser/src/plugins/typescript/index.ts:3396:20)]
+    [at TypeScriptParserMixin.parseMaybeConditional (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:390:17)]
+    [at TypeScriptParserMixin.parseMaybeAssign (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:301:21)]
+    [at TypeScriptParserMixin.parseMaybeAssign (/home/user/app/node_modules/@babel/parser/src/plugins/typescript/index.ts:3747:22)]
+    [at <anonymous> (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:257:12)]
+
+Import traces:
+  Client Component Browser:
+    ./user/app/src/app/app/page.tsx [Client Component Browser]
+    ./user/app/src/app/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./user/app/src/app/app/page.tsx [Client Component SSR]
+    ./user/app/src/app/app/page.tsx [Server Component]
+2026-02-25T19:33:16.515Z [console][error] ./user/app/src/app/app/page.tsx:2024:144
+Parsing ecmascript source code failed
+  2022 |             <div className="flex items-center gap-3 shrink-0">
+  2023 |               <span style={{ opacity: 0.45 }}>{row.vol}/mo</span>
+> 2024 |               <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: row.intent === "High" ? "#DCFCE7" , color: row.intent === "High" ? "#15803D" : "#92400E" }}>
+       |                                                                                                                                                ^
+  2025 |                 {row.intent}
+  2026 |               </span>
+  2027 |             </div>
+
+Expected '</', got ','
+
+Import traces:
+  Client Component Browser:
+    ./user/app/src/app/app/page.tsx [Client Component Browser]
+    ./user/app/src/app/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./user/app/src/app/app/page.tsx [Client Component SSR]
+    ./user/app/src/app/app/page.tsx [Server Component]
+2026-02-25T19:32:25.508Z [console][error] ./user/app/src/app/app/page.tsx:2120:144
+Parsing ecmascript source code failed
+  2118 |             <div className="flex items-center gap-3 shrink-0">
+  2119 |               <span style={{ opacity: 0.45 }}>{row.vol}/mo</span>
+> 2120 |               <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: row.intent === "High" ? "#DCFCE7" , color: row.intent === "High" ? "#15803D" : "#92400E" }}>
+       |                                                                                                                                                ^
+  2121 |                 {row.intent}
+  2122 |               </span>
+  2123 |             </div>
+
+Expected '</', got ','
+
+Import traces:
+  Client Component Browser:
+    ./user/app/src/app/app/page.tsx [Client Component Browser]
+    ./user/app/src/app/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./user/app/src/app/app/page.tsx [Client Component SSR]
+    ./user/app/src/app/app/page.tsx [Server Component]
+2026-02-25T19:33:06.168Z [console][error] ./user/app/src/app/app/page.tsx
+Error evaluating Node.js code
+SyntaxError: Unexpected token, expected ":" (2025:143)
+    [at toParseError (/home/user/app/node_modules/@babel/parser/src/parse-error.ts:95:45)]
+    [at TypeScriptParserMixin.raise (/home/user/app/node_modules/@babel/parser/src/tokenizer/index.ts:1507:19)]
+    [at TypeScriptParserMixin.unexpected (/home/user/app/node_modules/@babel/parser/src/tokenizer/index.ts:1547:16)]
+    [at TypeScriptParserMixin.expect (/home/user/app/node_modules/@babel/parser/src/parser/util.ts:157:12)]
+    [at TypeScriptParserMixin.parseConditional (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:404:12)]
+    [at TypeScriptParserMixin.parseConditional (/home/user/app/node_modules/@babel/parser/src/plugins/typescript/index.ts:3396:20)]
+    [at TypeScriptParserMixin.parseMaybeConditional (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:390:17)]
+    [at TypeScriptParserMixin.parseMaybeAssign (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:301:21)]
+    [at TypeScriptParserMixin.parseMaybeAssign (/home/user/app/node_modules/@babel/parser/src/plugins/typescript/index.ts:3747:22)]
+    [at <anonymous> (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:257:12)]
+
+Import traces:
+  Client Component Browser:
+    ./user/app/src/app/app/page.tsx [Client Component Browser]
+    ./user/app/src/app/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./user/app/src/app/app/page.tsx [Client Component SSR]
+    ./user/app/src/app/app/page.tsx [Server Component]
+2026-02-25T19:33:06.168Z [console][error] ./user/app/src/app/app/page.tsx:2025:144
+Parsing ecmascript source code failed
+  2023 |             <div className="flex items-center gap-3 shrink-0">
+  2024 |               <span style={{ opacity: 0.45 }}>{row.vol}/mo</span>
+> 2025 |               <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: row.intent === "High" ? "#DCFCE7" , color: row.intent === "High" ? "#15803D" : "#92400E" }}>
+       |                                                                                                                                                ^
+  2026 |                 {row.intent}
+  2027 |               </span>
+  2028 |             </div>
+
+Expected '</', got ','
+
+Import traces:
+  Client Component Browser:
+    ./user/app/src/app/app/page.tsx [Client Component Browser]
+    ./user/app/src/app/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./user/app/src/app/app/page.tsx [Client Component SSR]
+    ./user/app/src/app/app/page.tsx [Server Component]
+2026-02-25T19:33:16.515Z [console][error] ./user/app/src/app/app/page.tsx
+Error evaluating Node.js code
+SyntaxError: Unexpected token, expected ":" (2024:143)
+    [at toParseError (/home/user/app/node_modules/@babel/parser/src/parse-error.ts:95:45)]
+    [at TypeScriptParserMixin.raise (/home/user/app/node_modules/@babel/parser/src/tokenizer/index.ts:1507:19)]
+    [at TypeScriptParserMixin.unexpected (/home/user/app/node_modules/@babel/parser/src/tokenizer/index.ts:1547:16)]
+    [at TypeScriptParserMixin.expect (/home/user/app/node_modules/@babel/parser/src/parser/util.ts:157:12)]
+    [at TypeScriptParserMixin.parseConditional (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:404:12)]
+    [at TypeScriptParserMixin.parseConditional (/home/user/app/node_modules/@babel/parser/src/plugins/typescript/index.ts:3396:20)]
+    [at TypeScriptParserMixin.parseMaybeConditional (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:390:17)]
+    [at TypeScriptParserMixin.parseMaybeAssign (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:301:21)]
+    [at TypeScriptParserMixin.parseMaybeAssign (/home/user/app/node_modules/@babel/parser/src/plugins/typescript/index.ts:3747:22)]
+    [at <anonymous> (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:257:12)]
+
+Import traces:
+  Client Component Browser:
+    ./user/app/src/app/app/page.tsx [Client Component Browser]
+    ./user/app/src/app/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./user/app/src/app/app/page.tsx [Client Component SSR]
+    ./user/app/src/app/app/page.tsx [Server Component]
+2026-02-25T19:33:16.515Z [console][error] ./user/app/src/app/app/page.tsx:2024:144
+Parsing ecmascript source code failed
+  2022 |             <div className="flex items-center gap-3 shrink-0">
+  2023 |               <span style={{ opacity: 0.45 }}>{row.vol}/mo</span>
+> 2024 |               <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: row.intent === "High" ? "#DCFCE7" , color: row.intent === "High" ? "#15803D" : "#92400E" }}>
+       |                                                                                                                                                ^
+  2025 |                 {row.intent}
+  2026 |               </span>
+  2027 |             </div>
+
+Expected '</', got ','
+
+Import traces:
+  Client Component Browser:
+    ./user/app/src/app/app/page.tsx [Client Component Browser]
+    ./user/app/src/app/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./user/app/src/app/app/page.tsx [Client Component SSR]
+    ./user/app/src/app/app/page.tsx [Server Component]
+2026-02-25T19:33:16.515Z [console][error] ./user/app/src/app/app/page.tsx
+Error evaluating Node.js code
+SyntaxError: Unexpected token, expected ":" (2024:143)
+    [at toParseError (/home/user/app/node_modules/@babel/parser/src/parse-error.ts:95:45)]
+    [at TypeScriptParserMixin.raise (/home/user/app/node_modules/@babel/parser/src/tokenizer/index.ts:1507:19)]
+    [at TypeScriptParserMixin.unexpected (/home/user/app/node_modules/@babel/parser/src/tokenizer/index.ts:1547:16)]
+    [at TypeScriptParserMixin.expect (/home/user/app/node_modules/@babel/parser/src/parser/util.ts:157:12)]
+    [at TypeScriptParserMixin.parseConditional (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:404:12)]
+    [at TypeScriptParserMixin.parseConditional (/home/user/app/node_modules/@babel/parser/src/plugins/typescript/index.ts:3396:20)]
+    [at TypeScriptParserMixin.parseMaybeConditional (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:390:17)]
+    [at TypeScriptParserMixin.parseMaybeAssign (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:301:21)]
+    [at TypeScriptParserMixin.parseMaybeAssign (/home/user/app/node_modules/@babel/parser/src/plugins/typescript/index.ts:3747:22)]
+    [at <anonymous> (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:257:12)]
+
+Import traces:
+  Client Component Browser:
+    ./user/app/src/app/app/page.tsx [Client Component Browser]
+    ./user/app/src/app/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./user/app/src/app/app/page.tsx [Client Component SSR]
+    ./user/app/src/app/app/page.tsx [Server Component]
+2026-02-25T19:33:16.515Z [console][error] ./user/app/src/app/app/page.tsx:2024:144
+Parsing ecmascript source code failed
+  2022 |             <div className="flex items-center gap-3 shrink-0">
+  2023 |               <span style={{ opacity: 0.45 }}>{row.vol}/mo</span>
+> 2024 |               <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: row.intent === "High" ? "#DCFCE7" , color: row.intent === "High" ? "#15803D" : "#92400E" }}>
+       |                                                                                                                                                ^
+  2025 |                 {row.intent}
+  2026 |               </span>
+  2027 |             </div>
+
+Expected '</', got ','
+
+Import traces:
+  Client Component Browser:
+    ./user/app/src/app/app/page.tsx [Client Component Browser]
+    ./user/app/src/app/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./user/app/src/app/app/page.tsx [Client Component SSR]
+    ./user/app/src/app/app/page.tsx [Server Component]
+2026-02-25T19:33:55.642Z [console][warn] [HMR] Invalid message: {"isTrusted":true}
+TypeError: Cannot convert undefined or null to object
+    at Object.keys (<anonymous>)
+    at extractModulesFromTurbopackMessage (https://3000-1949c110-a75b-4452-96dd-9eb649f2c84f.orchids.cloud/_next/static/chunks/135e9_next_dist_client_b7d60af8._.js:5974:39)
+    at TurbopackHmr.onTurbopackMessage (https://3000-1949c110-a75b-4452-96dd-9eb649f2c84f.orchids.cloud/_next/static/chunks/135e9_next_dist_client_b7d60af8._.js:5872:32)
+    at processMessage (https://3000-1949c110-a75b-4452-96dd-9eb649f2c84f.orchids.cloud/_next/static/chunks/135e9_next_dist_client_b7d60af8._.js:6276:30)
+    at WebSocket.handler (https://3000-1949c110-a75b-4452-96dd-9eb649f2c84f.orchids.cloud/_next/static/chunks/135e9_next_dist_client_b7d60af8._.js:6417:17)
+2026-02-25T19:33:06.168Z [console][error] ./user/app/src/app/app/page.tsx:2025:144
+Parsing ecmascript source code failed
+  2023 |             <div className="flex items-center gap-3 shrink-0">
+  2024 |               <span style={{ opacity: 0.45 }}>{row.vol}/mo</span>
+> 2025 |               <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: row.intent === "High" ? "#DCFCE7" , color: row.intent === "High" ? "#15803D" : "#92400E" }}>
+       |                                                                                                                                                ^
+  2026 |                 {row.intent}
+  2027 |               </span>
+  2028 |             </div>
+
+Expected '</', got ','
+
+Import traces:
+  Client Component Browser:
+    ./user/app/src/app/app/page.tsx [Client Component Browser]
+    ./user/app/src/app/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./user/app/src/app/app/page.tsx [Client Component SSR]
+    ./user/app/src/app/app/page.tsx [Server Component]
+2026-02-25T19:33:16.515Z [console][error] ./user/app/src/app/app/page.tsx
+Error evaluating Node.js code
+SyntaxError: Unexpected token, expected ":" (2024:143)
+    [at toParseError (/home/user/app/node_modules/@babel/parser/src/parse-error.ts:95:45)]
+    [at TypeScriptParserMixin.raise (/home/user/app/node_modules/@babel/parser/src/tokenizer/index.ts:1507:19)]
+    [at TypeScriptParserMixin.unexpected (/home/user/app/node_modules/@babel/parser/src/tokenizer/index.ts:1547:16)]
+    [at TypeScriptParserMixin.expect (/home/user/app/node_modules/@babel/parser/src/parser/util.ts:157:12)]
+    [at TypeScriptParserMixin.parseConditional (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:404:12)]
+    [at TypeScriptParserMixin.parseConditional (/home/user/app/node_modules/@babel/parser/src/plugins/typescript/index.ts:3396:20)]
+    [at TypeScriptParserMixin.parseMaybeConditional (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:390:17)]
+    [at TypeScriptParserMixin.parseMaybeAssign (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:301:21)]
+    [at TypeScriptParserMixin.parseMaybeAssign (/home/user/app/node_modules/@babel/parser/src/plugins/typescript/index.ts:3747:22)]
+    [at <anonymous> (/home/user/app/node_modules/@babel/parser/src/parser/expression.ts:257:12)]
+
+Import traces:
+  Client Component Browser:
+    ./user/app/src/app/app/page.tsx [Client Component Browser]
+    ./user/app/src/app/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./user/app/src/app/app/page.tsx [Client Component SSR]
+    ./user/app/src/app/app/page.tsx [Server Component]
+2026-02-25T19:33:16.515Z [console][error] ./user/app/src/app/app/page.tsx:2024:144
+Parsing ecmascript source code failed
+  2022 |             <div className="flex items-center gap-3 shrink-0">
+  2023 |               <span style={{ opacity: 0.45 }}>{row.vol}/mo</span>
+> 2024 |               <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: row.intent === "High" ? "#DCFCE7" , color: row.intent === "High" ? "#15803D" : "#92400E" }}>
+       |                                                                                                                                                ^
+  2025 |                 {row.intent}
+  2026 |               </span>
+  2027 |             </div>
+
+Expected '</', got ','
+
+Import traces:
+  Client Component Browser:
+    ./user/app/src/app/app/page.tsx [Client Component Browser]
+    ./user/app/src/app/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./user/app/src/app/app/page.tsx [Client Component SSR]
+    ./user/app/src/app/app/page.tsx [Server Component]
+2026-02-26T19:26:48.286Z [console][warn] Image with src "/system-logo.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+2026-03-02T02:06:26.660Z [console][warn] Detected `scroll-behavior: smooth` on the `<html>` element. In a future version, Next.js will no longer automatically disable smooth scrolling during route transitions. To prepare for this change, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+2026-03-02T02:18:35.909Z [console][warn] Image with src "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/ac7698f2-a38b-41d3-98e1-66161d9459d0/swivo-resized-1772417255079.webp?width=8000&height=8000&resize=contain" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+2026-03-02T02:18:51.318Z [console][warn] Image with src "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/ac7698f2-a38b-41d3-98e1-66161d9459d0/swivo-resized-1772417255079.webp?width=8000&height=8000&resize=contain" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+2026-03-02T02:19:38.357Z [console][warn] Image with src "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/project-uploads/ac7698f2-a38b-41d3-98e1-66161d9459d0/swivo-resized-1772417255079.webp?width=8000&height=8000&resize=contain" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+2026-03-02T02:18:32.586Z [network][POST 200] /api/auth/login
+  request: {"email":"luccincali@gmail.com","password":"@Lifo1825"}
+  response: {"user":{"id":"dd23ede6-558a-407e-bf3d-976fbbc14b99","aud":"authenticated","role":"authenticated","email":"luccincali@gmail.com","email_confirmed_at":"2026-02-18T17:55:21.973341Z","phone":"","confirmation_sent_at":"2026-02-18T17:55:20.594879Z","confirmed_at":"2026-02-18T17:55:21.973341Z","last_sign_in_at":"2026-03-02T02:18:32.43768215Z","app_metadata":{"provider":"email","providers":["email"]},"user_metadata":{"email":"luccincali@gmail.com","email_verified":true,"phone_verified":false,"sub":"dd23ede6-558a-407e-bf3d-976fbbc14b99"},"identities":[{"identity_id":"b91d3dac-b8cc-4ffa-9069-8c92da3a696e","id":"dd23ede6-558a-407e-bf3d-976fbbc14b99","user_id":"dd23ede6-558a-407e-bf3d-976fbbc14b99","identity_data":{"email":"luccincali@gmail.com","email_verified":false,"phone_verified":false,"sub":"dd23ede6-558a-407e-bf3d-976fbbc14b99"},"provider":"email","last_sign_in_at":"2026-02-18T17:55:20.565584Z","created_at":"2026-02-18T17:55:20.565651Z","updated_at":"2026-02-18T17:55:20.565651Z","email":"luccincali@gmail.com"}],"created_at":"2026-02-18T17:55:20.528109Z","updated_at":"2026-03-02T02:18:32.475093Z","is_anonymous":false}}
+2026-03-02T02:18:49.541Z [network][POST 200] /api/auth/login
+  request: {"email":"luccincali@gmail.com","password":"@Lifo1825"}
+  response: {"user":{"id":"dd23ede6-558a-407e-bf3d-976fbbc14b99","aud":"authenticated","role":"authenticated","email":"luccincali@gmail.com","email_confirmed_at":"2026-02-18T17:55:21.973341Z","phone":"","confirmation_sent_at":"2026-02-18T17:55:20.594879Z","confirmed_at":"2026-02-18T17:55:21.973341Z","last_sign_in_at":"2026-03-02T02:18:49.490526927Z","app_metadata":{"provider":"email","providers":["email"]},"user_metadata":{"email":"luccincali@gmail.com","email_verified":true,"phone_verified":false,"sub":"dd23ede6-558a-407e-bf3d-976fbbc14b99"},"identities":[{"identity_id":"b91d3dac-b8cc-4ffa-9069-8c92da3a696e","id":"dd23ede6-558a-407e-bf3d-976fbbc14b99","user_id":"dd23ede6-558a-407e-bf3d-976fbbc14b99","identity_data":{"email":"luccincali@gmail.com","email_verified":false,"phone_verified":false,"sub":"dd23ede6-558a-407e-bf3d-976fbbc14b99"},"provider":"email","last_sign_in_at":"2026-02-18T17:55:20.565584Z","created_at":"2026-02-18T17:55:20.565651Z","updated_at":"2026-02-18T17:55:20.565651Z","email":"luccincali@gmail.com"}],"created_at":"2026-02-18T17:55:20.528109Z","updated_at":"2026-03-02T02:18:49.493789Z","is_anonymous":false}}
+2026-03-02T02:19:42.351Z [network][POST 200] /__nextjs_original-stack-frames
+  request: {"frames":[{"file":"file:///home/user/app/.next/static/chunks/user_app_src_d7264dd0._.js","line1":1932,"column1":253,"methodName":"PricingPage","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":13072,"column1":24,"methodName":"Object.react_stack_bottom_frame","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":4091,"column1":24,"methodName":"renderWithHooks","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":5523,"column1":21,"methodName":"updateFunctionComponent","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":6111,"column1":24,"methodName":"beginWork","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":886,"column1":74,"methodName":"runWithFiberInDEV","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":8298,"column1":97,"methodName":"performUnitOfWork","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":8190,"column1":40,"methodName":"workLoopSync","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":8173,"column1":13,"methodName":"renderRootSync","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":7932,"column1":56,"methodName":"performWorkOnRoot","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":8882,"column1":9,"methodName":"performWorkOnRootViaSchedulerTask","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_d... [truncated]
+  response: [{"status":"rejected","reason":"[Error: Original file () outside project (file:///home/)\n\nDebug info:\n- Execution of TaskId { id: 2147484482 } transient failed\n- Execution of project_trace_source_operation failed\n- Original file () outside project (file:///home/)] {\n  code: 'GenericFailure'\n}"},{"status":"fulfilled","value":{"originalStackFrame":{"arguments":[],"file":"node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js","line1":23583,"column1":20,"ignored":true,"methodName":"Object.react_stack_bottom_frame"},"originalCodeFrame":null}},{"status":"fulfilled","value":{"originalStackFrame":{"arguments":[],"file":"node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js","line1":6792,"column1":22,"ignored":true,"methodName":"renderWithHooks"},"originalCodeFrame":null}},{"status":"fulfilled","value":{"originalStackFrame":{"arguments":[],"file":"node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js","line1":9246,"column1":19,"ignored":true,"methodName":"updateFunctionComponent"},"originalCodeFrame":null}},{"status":"fulfilled","value":{"originalStackFrame":{"arguments":[],"file":"node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js","line1":10857,"column1":18,"ignored":true,"methodName":"beginWork"},"originalCodeFrame":null}},{"status":"fulfilled","value":{"originalStackFrame":{"arguments":[],"file":"node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js","line1":871,"column1":30,"ignored":true,"methodName":"runWithFiberInDEV"},"originalCodeFrame":null}},{"status":"fulfilled","value":{"originalStackFrame":{"arguments":[],"file":"node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js","line1":15726,"column1":22,"ignored":true,"methodName":"performUnitOfWork"},"originalCodeFrame":null}},{"status":"fulfilled","value":{"originalStackFrame":{"arguments":[],"file":"node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.deve... [truncated]
+2026-03-02T02:19:49.726Z [network][POST 200] /__nextjs_original-stack-frames
+  request: {"frames":[{"file":"file:///home/user/app/.next/static/chunks/user_app_src_d7264dd0._.js","line1":1932,"column1":253,"methodName":"PricingPage","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":13072,"column1":24,"methodName":"Object.react_stack_bottom_frame","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":4091,"column1":24,"methodName":"renderWithHooks","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":5523,"column1":21,"methodName":"updateFunctionComponent","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":6111,"column1":24,"methodName":"beginWork","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":886,"column1":74,"methodName":"runWithFiberInDEV","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":8298,"column1":97,"methodName":"performUnitOfWork","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":8190,"column1":40,"methodName":"workLoopSync","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":8173,"column1":13,"methodName":"renderRootSync","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":7932,"column1":56,"methodName":"performWorkOnRoot","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_dist_compiled_react-dom_93fbc42d._.js","line1":8882,"column1":9,"methodName":"performWorkOnRootViaSchedulerTask","arguments":[]},{"file":"file:///home/user/app/.next/static/chunks/135e9_next_d... [truncated]
+  response: [{"status":"rejected","reason":"[Error: Original file () outside project (file:///home/)\n\nDebug info:\n- Execution of TaskId { id: 2147484499 } transient failed\n- Execution of project_trace_source_operation failed\n- Original file () outside project (file:///home/)] {\n  code: 'GenericFailure'\n}"},{"status":"fulfilled","value":{"originalStackFrame":{"arguments":[],"file":"node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js","line1":23583,"column1":20,"ignored":true,"methodName":"Object.react_stack_bottom_frame"},"originalCodeFrame":null}},{"status":"fulfilled","value":{"originalStackFrame":{"arguments":[],"file":"node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js","line1":6792,"column1":22,"ignored":true,"methodName":"renderWithHooks"},"originalCodeFrame":null}},{"status":"fulfilled","value":{"originalStackFrame":{"arguments":[],"file":"node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js","line1":9246,"column1":19,"ignored":true,"methodName":"updateFunctionComponent"},"originalCodeFrame":null}},{"status":"fulfilled","value":{"originalStackFrame":{"arguments":[],"file":"node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js","line1":10857,"column1":18,"ignored":true,"methodName":"beginWork"},"originalCodeFrame":null}},{"status":"fulfilled","value":{"originalStackFrame":{"arguments":[],"file":"node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js","line1":871,"column1":30,"ignored":true,"methodName":"runWithFiberInDEV"},"originalCodeFrame":null}},{"status":"fulfilled","value":{"originalStackFrame":{"arguments":[],"file":"node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js","line1":15726,"column1":22,"ignored":true,"methodName":"performUnitOfWork"},"originalCodeFrame":null}},{"status":"fulfilled","value":{"originalStackFrame":{"arguments":[],"file":"node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.deve... [truncated]
