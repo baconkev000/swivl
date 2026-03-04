@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
   const { agents } = await request.json();
@@ -26,16 +27,19 @@ export async function POST(request: Request) {
   // Create subscription record
   const { data, error } = await supabase
     .from("subscriptions")
-    .upsert({
-      user_id: user.id,
-      plan: planName,
-      price,
-      status: "active",
-      current_period_start: new Date().toISOString(),
-      current_period_end: new Date(
-        Date.now() + 30 * 24 * 60 * 60 * 1000
-      ).toISOString(),
-    }, { onConflict: "user_id" })
+    .upsert(
+      {
+        user_id: user.id,
+        plan: planName,
+        price,
+        status: "active",
+        current_period_start: new Date().toISOString(),
+        current_period_end: new Date(
+          Date.now() + 30 * 24 * 60 * 60 * 1000
+        ).toISOString(),
+      },
+      { onConflict: "user_id" }
+    )
     .select()
     .single();
 
@@ -54,7 +58,37 @@ export async function GET() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    // Fall back to Django/Google-authenticated session: check backend /api/users/me/.
+    const backendBase =
+      process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
+    const cookieHeader = cookies().toString();
+
+    try {
+      const res = await fetch(`${backendBase}/api/users/me/`, {
+        method: "GET",
+        headers: {
+          cookie: cookieHeader,
+          accept: "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        return NextResponse.json(
+          { error: "Not authenticated" },
+          { status: 401 }
+        );
+      }
+
+      // User is authenticated via backend (Google SSO) but has no Supabase profile/subscription.
+      // Return empty data so the dashboard can still render without a 401.
+      return NextResponse.json({ profile: null, subscription: null });
+    } catch {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
+    }
   }
 
   const { data: profile } = await supabase

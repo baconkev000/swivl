@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import Logo from "@/components/logo";
@@ -110,9 +111,9 @@ const agentIntegrations: Record<string, { name: string; logo: React.FC<{ size?: 
       required: false,
     },
     {
-      name: "WordPress",
-      logo: WordPressLogo,
-      description: "Allows seo to publish and update blog posts and pages automatically.",
+      name: "Google Ads",
+      logo: GoogleAdsLogo,
+      description: "Connect to see paid competition and search volume inside SEO insights.",
       required: false,
     },
     {
@@ -564,6 +565,12 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
   const [showReviews, setShowReviews] = useState(true);
   const [showLeads, setShowLeads] = useState(true);
   const [seoGscConnected, setSeoGscConnected] = useState<boolean>(false);
+  const [seoMetrics, setSeoMetrics] = useState<{
+    organic_visitors: number;
+    keywords_ranking: number;
+    top3_positions: number;
+    organic_growth_pct: number;
+  } | null>(null);
 
   const firstName = profile?.full_name?.split(" ")[0] ?? null;
   const bizName = profile?.business_name ?? null;
@@ -575,8 +582,19 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
         const res = await fetch("/api/integrations/google-search-console/status");
         if (!res.ok) return;
         const data = await res.json();
-        if (typeof data.connected === "boolean") {
-          setSeoGscConnected(data.connected);
+        const isConnected = typeof data.connected === "boolean" && data.connected;
+        setSeoGscConnected(isConnected);
+        if (isConnected) {
+          const metricsRes = await fetch("/api/seo/overview");
+          if (metricsRes.ok) {
+            const m = await metricsRes.json();
+            setSeoMetrics({
+              organic_visitors: m.organic_visitors ?? 0,
+              keywords_ranking: m.keywords_ranking ?? 0,
+              top3_positions: m.top3_positions ?? 0,
+              organic_growth_pct: m.organic_growth_pct ?? 0,
+            });
+          }
         }
       } catch {
         // Ignore errors; leave default false.
@@ -607,11 +625,30 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
             role="Demand Capture Operator — owns qualified inbound traffic"
             initial="s"
             headlineLabel="Organic Visitors This Month"
-            headlineValue="1,240"
+            headlineValue={
+              seoMetrics
+                ? seoMetrics.organic_visitors.toLocaleString()
+                : "—"
+            }
             stats={[
-              { label: "Keywords ranking", value: "248" },
-              { label: "Top 3 positions", value: "34" },
-              { label: "Organic growth", value: "+34%" },
+              {
+                label: "Keywords ranking",
+                value: seoMetrics
+                  ? seoMetrics.keywords_ranking.toLocaleString()
+                  : "—",
+              },
+              {
+                label: "Top 3 positions",
+                value: seoMetrics
+                  ? seoMetrics.top3_positions.toLocaleString()
+                  : "—",
+              },
+              {
+                label: "Organic growth",
+                value: seoMetrics
+                  ? `${seoMetrics.organic_growth_pct >= 0 ? "+" : ""}${seoMetrics.organic_growth_pct.toFixed(0)}%`
+                  : "—",
+              },
             ]}
             sparkData={[180, 210, 195, 240, 260, 310, 370]}
             status={bizName ? `Capturing demand for ${bizName} — 2 posts publishing today` : "Capturing demand — 2 posts publishing today"}
@@ -874,7 +911,7 @@ const allIntegrations = [
 const initialConnected: Record<string, boolean> = {
   "seo-Google Search Console": false,
   "seo-Google Analytics": true,
-  "seo-WordPress": false,
+  "seo-Google Ads": false,
   "seo-Semrush": false,
   "reviews-Google Business Profile": false,
   "reviews-Yelp": false,
@@ -890,7 +927,7 @@ function IntegrationsView({ focusAgent }: { focusAgent?: string }) {
   const [connected, setConnected] = useState<Record<string, boolean>>(initialConnected);
   const [connecting, setConnecting] = useState<string | null>(null);
 
-  // On mount, fetch real Google Search Console connection status for the current user.
+  // On mount, fetch real Google Search Console & Google Ads connection status for the current user.
   useEffect(() => {
     const loadGscStatus = async () => {
       try {
@@ -907,7 +944,25 @@ function IntegrationsView({ focusAgent }: { focusAgent?: string }) {
         // Ignore errors; leave default state.
       }
     };
+
+    const loadAdsStatus = async () => {
+      try {
+        const res = await fetch("/api/integrations/google-ads/status");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (typeof data.connected === "boolean") {
+          setConnected((prev) => ({
+            ...prev,
+            "seo-Google Ads": data.connected,
+          }));
+        }
+      } catch {
+        // Ignore errors; leave default state.
+      }
+    };
+
     loadGscStatus();
+    loadAdsStatus();
   }, []);
 
   const toggle = (agent: string, name: string) => {
@@ -931,6 +986,16 @@ function IntegrationsView({ focusAgent }: { focusAgent?: string }) {
         process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
       const next = `${window.location.origin}/app?tab=integrations`;
       window.location.href = `${backendBase}/integrations/google-search-console/start/?next=${encodeURIComponent(
+        next,
+      )}`;
+      return;
+    }
+    // Special-case Google Ads: start OAuth flow via backend
+    if (key === "seo-Google Ads" || key === "ads-Google Ads") {
+      const backendBase =
+        process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
+      const next = `${window.location.origin}/app?tab=integrations`;
+      window.location.href = `${backendBase}/integrations/google-ads/start/?next=${encodeURIComponent(
         next,
       )}`;
       return;
@@ -1281,7 +1346,7 @@ const agentConfig: Record<string, {
 
 /* ─── Agent Detail + Chat View ─── */
 type ChatMessage = { role: "user" | "agent"; text: string };
-type ChatThread = { id: number; title: string; messages: ChatMessage[] };
+type ChatThread = { id: number; title: string; messages: ChatMessage[]; conversationId?: number | null };
 
 const agentDetailData: Record<string, {
   activity: { time: string; text: string; type: "done" | "working" | "alert" }[];
@@ -1310,9 +1375,9 @@ const agentDetailData: Record<string, {
       { label: "Built 34 high-quality backlinks — DA now 62", status: "done" },
     ],
     stats: [
-      { label: "Organic Visitors", value: "1,240", sub: "+18% this month", icon: Eye },
-      { label: "Keywords Ranking", value: "248", sub: "34 in top 3 positions", icon: TrendingUp },
-      { label: "Domain Authority", value: "62", sub: "Up from 58", icon: BarChart3 },
+      { label: "Organic Visitors This Month", value: "1,240", sub: "+18% this month", icon: Eye },
+      { label: "Keywords ranking", value: "248", sub: "34 in top 3 positions", icon: TrendingUp },
+      { label: "Top 3 positions", value: "34", sub: "", icon: BarChart3 },
     ],
   },
   reviews: {
@@ -1374,18 +1439,53 @@ function SEOAgentOverview({
   cfg,
   detail,
   onChat,
+  metrics,
 }: {
   cfg: typeof agentConfig["seo"];
   detail: typeof agentDetailData["seo"];
   onChat: (msg: string) => void;
+  metrics?: {
+    organic_visitors: number;
+    keywords_ranking: number;
+    top3_positions: number;
+    organic_growth_pct: number;
+  } | null;
 }) {
-  const keywordData = [
-    { keyword: "best plumber near me", intent: "HIGH", volume: "2,400", position: 2, change: "▲3" },
-    { keyword: "emergency plumber Chicago", intent: "HIGH", volume: "1,100", position: 1, change: "▲5" },
-    { keyword: "plumber cost estimate", intent: "MED", volume: "890", position: 4, change: "▲2" },
-    { keyword: "local plumbing services", intent: "MED", volume: "720", position: 6, change: "▲1" },
-    { keyword: "water heater repair", intent: "HIGH", volume: "540", position: 3, change: "▲4" },
-  ];
+  const [keywordData, setKeywordData] = useState<{
+    keyword: string;
+    avg_monthly_searches: number | null;
+    intent: string;
+    position: number;
+    position_change: number | null;
+    impressions: number;
+    clicks: number;
+  }[]>([]);
+
+  useEffect(() => {
+    const loadKeywords = async () => {
+      try {
+        const res = await fetch("/api/seo/keywords");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (Array.isArray(data.keywords)) {
+          setKeywordData(
+            data.keywords.map((k: any) => ({
+              keyword: k.keyword,
+              avg_monthly_searches: k.avg_monthly_searches ?? null,
+              intent: k.intent ?? "MEDIUM",
+              position: k.current_position ?? 0,
+              position_change: k.position_change ?? null,
+              impressions: k.impressions ?? 0,
+              clicks: k.clicks ?? 0,
+            })),
+          );
+        }
+      } catch {
+        // leave keywordData empty on error
+      }
+    };
+    loadKeywords();
+  }, []);
 
   const contentPipeline = [
     { title: "Top 5 Signs You Need a Plumber", status: "publishing", intent: "HIGH", eta: "Today" },
@@ -1409,18 +1509,55 @@ function SEOAgentOverview({
   return (
     <div className="space-y-4">
 
-      {/* Stats Row */}
+      {/* Stats Row (GSC-powered) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {detail.stats.map((s) => (
-          <div key={s.label} className="bg-white rounded-3xl p-6 flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-black" style={{ opacity: 0.4 }}><s.icon size={13} /></span>
-              <p className="text-[11px] font-medium text-black uppercase tracking-wide" style={{ opacity: 0.4 }}>{s.label}</p>
-            </div>
-            <p className="text-[36px] font-semibold tracking-[-0.04em] leading-none text-black">{s.value}</p>
-            <p className="text-[12px] text-black" style={{ opacity: 0.4 }}>{s.sub}</p>
+        {/* Organic Visitors This Month */}
+        <div className="bg-white rounded-3xl p-6 flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-black" style={{ opacity: 0.4 }}><Eye size={13} /></span>
+            <p className="text-[11px] font-medium text-black uppercase tracking-wide" style={{ opacity: 0.4 }}>
+              Organic Visitors This Month
+            </p>
           </div>
-        ))}
+          <p className="text-[36px] font-semibold tracking-[-0.04em] leading-none text-black">
+            {metrics ? metrics.organic_visitors.toLocaleString() : "—"}
+          </p>
+          <p className="text-[12px] text-black" style={{ opacity: 0.4 }}>
+            {metrics
+              ? `${metrics.organic_growth_pct >= 0 ? "+" : ""}${metrics.organic_growth_pct.toFixed(0)}% this month`
+              : ""}
+          </p>
+        </div>
+
+        {/* Keywords ranking */}
+        <div className="bg-white rounded-3xl p-6 flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-black" style={{ opacity: 0.4 }}><TrendingUp size={13} /></span>
+            <p className="text-[11px] font-medium text-black uppercase tracking-wide" style={{ opacity: 0.4 }}>
+              Keywords ranking
+            </p>
+          </div>
+          <p className="text-[36px] font-semibold tracking-[-0.04em] leading-none text-black">
+            {metrics ? metrics.keywords_ranking.toLocaleString() : "—"}
+          </p>
+          <p className="text-[12px] text-black" style={{ opacity: 0.4 }}>
+            {metrics ? `${metrics.top3_positions.toLocaleString()} in top 3 positions` : ""}
+          </p>
+        </div>
+
+        {/* Top 3 positions */}
+        <div className="bg-white rounded-3xl p-6 flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-black" style={{ opacity: 0.4 }}><BarChart3 size={13} /></span>
+            <p className="text-[11px] font-medium text-black uppercase tracking-wide" style={{ opacity: 0.4 }}>
+              Top 3 positions
+            </p>
+          </div>
+          <p className="text-[36px] font-semibold tracking-[-0.04em] leading-none text-black">
+            {metrics ? metrics.top3_positions.toLocaleString() : "—"}
+          </p>
+          <p className="text-[12px] text-black" style={{ opacity: 0.0 }}>&nbsp;</p>
+        </div>
       </div>
 
       {/* Keyword Rankings + Content Pipeline */}
@@ -1431,30 +1568,64 @@ function SEOAgentOverview({
           <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: "1px solid #f5f5f7" }}>
             <div>
               <h3 className="text-[15px] font-semibold text-black">High-Intent Keywords</h3>
-              <p className="text-[12px] text-black mt-0.5" style={{ opacity: 0.4 }}>Ranked by buyer intent — not vanity traffic</p>
+              <p className="text-[12px] text-black mt-0.5" style={{ opacity: 0.4 }}>
+                Combined from Google Search Console, Google Ads, and intent rules
+              </p>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ backgroundColor: "#EFF6FF" }}>
               <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-              <span className="text-[11px] font-medium" style={{ color: "#0088FF" }}>Tracking 248</span>
+              <span className="text-[11px] font-medium" style={{ color: "#0088FF" }}>
+                Tracking {keywordData.length || "—"}
+              </span>
             </div>
           </div>
           <div className="divide-y" style={{ borderColor: "#f5f5f7" }}>
             {keywordData.map((kw, i) => (
-              <div key={i} className="flex items-center gap-3 px-6 py-3.5 transition-colors"
+              <div
+                key={i}
+                className="grid grid-cols-2 md:grid-cols-5 gap-3 px-6 py-3.5 items-center text-[12px] transition-colors"
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#F9F9F9")}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
               >
-                <div className="flex-1 min-w-0">
+                {/* Keyword */}
+                <div className="md:col-span-2 min-w-0">
                   <p className="text-[13px] font-medium text-black truncate">{kw.keyword}</p>
-                  <p className="text-[11px] text-black mt-0.5" style={{ opacity: 0.4 }}>{kw.volume} searches/mo</p>
                 </div>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0"
-                  style={{ backgroundColor: intentBg(kw.intent), color: intentColor(kw.intent) }}>
-                  {kw.intent}
-                </span>
-                <div className="text-right shrink-0">
-                  <p className="text-[13px] font-semibold text-black">#{kw.position}</p>
-                  <p className="text-[11px]" style={{ color: "#22C55E" }}>{kw.change}</p>
+
+                {/* Monthly search volume */}
+                <div className="text-[12px] text-black" style={{ opacity: 0.7 }}>
+                  {kw.avg_monthly_searches != null
+                    ? `${kw.avg_monthly_searches.toLocaleString()} searches/mo`
+                    : "—"}
+                </div>
+
+                {/* Intent */}
+                <div>
+                  <span
+                    className="text-[10px] font-semibold px-2 py-0.5 rounded-full inline-block"
+                    style={{
+                      backgroundColor: intentBg(kw.intent),
+                      color: intentColor(kw.intent),
+                    }}
+                  >
+                    {kw.intent}
+                  </span>
+                </div>
+
+                {/* Current Position */}
+                <div className="text-[12px] text-black" style={{ opacity: 0.7 }}>
+                  {kw.position ? `#${kw.position}` : "—"}
+                </div>
+
+                {/* Position change */}
+                <div className="text-[12px] text-black" style={{ opacity: 0.7 }}>
+                  {kw.position_change == null
+                    ? "—"
+                    : kw.position_change > 0
+                      ? `▲${kw.position_change.toFixed(0)}`
+                      : kw.position_change < 0
+                        ? `▼${Math.abs(kw.position_change).toFixed(0)}`
+                        : "—"}
                 </div>
               </div>
             ))}
@@ -2242,10 +2413,38 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
   const [activeChatId, setActiveChatId] = useState(0);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
+  const [chatInputFocused, setChatInputFocused] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [seoMetrics, setSeoMetrics] = useState<{
+    organic_visitors: number;
+    keywords_ranking: number;
+    top3_positions: number;
+    organic_growth_pct: number;
+  } | null>(null);
 
   const cfg = agentConfig[agentName];
   const detail = agentDetailData[agentName];
+
+  useEffect(() => {
+    // Load SEO metrics for the SEO agent overview tab
+    const loadSeoMetrics = async () => {
+      if (agentName !== "seo") return;
+      try {
+        const res = await fetch("/api/seo/overview");
+        if (!res.ok) return;
+        const m = await res.json();
+        setSeoMetrics({
+          organic_visitors: m.organic_visitors ?? 0,
+          keywords_ranking: m.keywords_ranking ?? 0,
+          top3_positions: m.top3_positions ?? 0,
+          organic_growth_pct: m.organic_growth_pct ?? 0,
+        });
+      } catch {
+        // leave metrics null on error
+      }
+    };
+    loadSeoMetrics();
+  }, [agentName]);
 
   useEffect(() => {
     if (chats.length > 0 && activeChatId !== undefined) {
@@ -2262,7 +2461,7 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
 
   function newChat() {
     const id = Date.now();
-    setChats((prev) => [{ id, title: "New conversation", messages: [] }, ...prev]);
+    setChats((prev) => [{ id, title: "New conversation", messages: [], conversationId: null }, ...prev]);
     setActiveChatId(id);
     setTab("chat");
   }
@@ -2279,16 +2478,74 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
       )
     );
     setInput("");
-    setTyping(true);
-    setTimeout(() => {
-      const agentMsg: ChatMessage = { role: "agent", text: cfg.getReply(t) };
-      setChats((prev) =>
-        prev.map((c) =>
-          c.id === activeChatId ? { ...c, messages: [...c.messages, userMsg, agentMsg] } : c
-        )
-      );
-      setTyping(false);
-    }, 1200);
+
+    if (agentName === "seo") {
+      // Use real SEO agent backend (OpenAI) for chat
+      const currentThread = chats.find((c) => c.id === activeChatId);
+      const conversationId = currentThread?.conversationId ?? null;
+
+      setTyping(true);
+      fetch("/api/seo/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: t, conversation_id: conversationId }),
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            const error = await res.text();
+            throw new Error(error || "Chat failed");
+          }
+          return res.json();
+        })
+        .then((data) => {
+          const replyText = data.reply as string;
+          const newConversationId = (data.conversation_id as number) ?? conversationId;
+          const agentMsg: ChatMessage = { role: "agent", text: replyText };
+          setChats((prev) =>
+            prev.map((c) =>
+              c.id === activeChatId
+                ? {
+                    ...c,
+                    conversationId: newConversationId,
+                    // userMsg was already added optimistically above; only append agent reply
+                    messages: [...c.messages, agentMsg],
+                  }
+                : c
+            )
+          );
+        })
+        .catch(() => {
+          // On error, keep the user message but show a basic error reply.
+          const agentMsg: ChatMessage = {
+            role: "agent",
+            text: "Sorry, I couldn't process that request right now. Please try again.",
+          };
+          setChats((prev) =>
+            prev.map((c) =>
+              c.id === activeChatId
+                // userMsg already present; just append error reply
+                ? { ...c, messages: [...c.messages, agentMsg] }
+                : c
+            )
+          );
+        })
+        .finally(() => {
+          setTyping(false);
+        });
+    } else {
+      // Keep existing scripted behaviour for other agents for now
+      setTyping(true);
+      setTimeout(() => {
+        const agentMsg: ChatMessage = { role: "agent", text: cfg.getReply(t) };
+        setChats((prev) =>
+          prev.map((c) =>
+            // userMsg already present; only append scripted agent reply
+            c.id === activeChatId ? { ...c, messages: [...c.messages, agentMsg] } : c
+          )
+        );
+        setTyping(false);
+      }, 1200);
+    }
   }
 
   function handleKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -2393,7 +2650,15 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
 
       {/* ── OVERVIEW TAB ── */}
       {tab === "overview" && agentName === "seo" ? (
-        <SEOAgentOverview cfg={cfg} detail={detail} onChat={(msg) => { setTab("chat"); setTimeout(() => send(msg), 50); }} />
+        <SEOAgentOverview
+          cfg={cfg}
+          detail={detail}
+          metrics={seoMetrics}
+          onChat={(msg) => {
+            setTab("chat");
+            setTimeout(() => send(msg), 50);
+          }}
+        />
       ) : tab === "overview" && agentName === "ads" ? (
         <AdsAgentOverview cfg={cfg as typeof agentConfig["ads"]} detail={detail} onChat={(msg) => { setTab("chat"); setTimeout(() => send(msg), 50); }} />
       ) : tab === "overview" && agentName === "reviews" ? (
@@ -2603,14 +2868,16 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
                   >
                     <Plus size={22} strokeWidth={2.5} />
                   </button>
-                  <div className="flex-1 flex items-center bg-[#f5f5f7] rounded-full pl-5 pr-1.5 py-1.5 min-h-[46px]">
+                  <div className={`flex-1 flex items-center bg-[#f5f5f7] rounded-2xl pl-5 pr-1.5 py-1.5 transition-[min-height] duration-200 ${chatInputFocused ? "min-h-[120px] rounded-2xl" : "min-h-[46px] rounded-full"}`}>
                     <textarea
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKey}
+                      onFocus={() => setChatInputFocused(true)}
+                      onBlur={() => setChatInputFocused(false)}
                       placeholder="Ask anything"
-                      rows={1}
-                      className="flex-1 text-[16px] text-black bg-transparent outline-none resize-none leading-tight py-1.5 placeholder:text-black/40"
+                      rows={chatInputFocused ? 4 : 1}
+                      className="flex-1 text-[16px] text-black bg-transparent outline-none resize-none leading-tight py-1.5 placeholder:text-black/40 transition-[min-height] duration-200"
                       style={{ caretColor: "#000" }}
                     />
                   <div className="flex items-center gap-1">
@@ -2785,24 +3052,8 @@ function SettingsView({
           {/* Row 3 */}
           {field("Business Address", "business_address", "123 Main St, Chicago, IL 60601")}
 
-          {/* Industry */}
-          <div>
-            <label className="block text-[12px] font-medium text-black mb-1.5" style={{ opacity: 0.5 }}>Industry</label>
-            <div className="relative">
-              <select
-                value={form.industry}
-                onChange={(e) => setForm((f) => ({ ...f, industry: e.target.value }))}
-                className="w-full px-4 py-3 rounded-2xl text-[14px] text-black bg-white outline-none appearance-none cursor-pointer transition-all"
-                style={{ border: "1.5px solid #EFEFEF" }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = "#1d1d1f")}
-                onBlur={(e) => (e.currentTarget.style.borderColor = "#EFEFEF")}
-              >
-                <option value="">Select your industry…</option>
-                {INDUSTRIES.map((i) => <option key={i} value={i}>{i}</option>)}
-              </select>
-              <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-black" style={{ opacity: 0.4 }} />
-            </div>
-          </div>
+          {/* Industry (free text) */}
+          {field("Industry", "industry", "Plumbing, HVAC, legal services, etc.")}
 
           {/* Business Description */}
           <div>
@@ -3495,7 +3746,9 @@ function AppContent() {
           >
 
             <div className="pt-7 pb-8 flex items-center px-6">
-              <Logo height={23.1} />
+              <Link href="/">
+                <Logo height={23.1} />
+              </Link>
             </div>
 
           <nav className="flex-1 px-2 space-y-1">
@@ -3579,7 +3832,9 @@ function AppContent() {
             >
               <Menu size={20} />
             </button>
+            <Link href="/">
               <Logo height={18.5} />
+            </Link>
               <div className="w-8" /> {/* spacer for centering logo */}
           </div>
 
@@ -3598,7 +3853,9 @@ function AppContent() {
                       {/* Mobile Logo - Only on main dashboard */}
                       {activeNav === "dashboard" && (
                         <div className="md:hidden flex justify-center pt-5 pb-0 bg-[#f5f5f7]">
-                          <Logo height={18} />
+                          <Link href="/">
+                            <Logo height={18} />
+                          </Link>
                         </div>
                       )}
                   {activeNav === "dashboard" && <DashboardView profile={profile} onConnect={handleConnect} onOpenChat={handleOpenChat} />}
