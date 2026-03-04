@@ -1,48 +1,54 @@
-import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
 export async function GET() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const backendBase =
+    process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
 
-  if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  const cookieHeader = cookies().toString();
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id, email, full_name, plan, business_name, business_address, industry, tone_of_voice, phone, description, website_url, created_at")
-    .eq("id", user.id)
-    .single();
+  const res = await fetch(`${backendBase}/api/business-profile/`, {
+    method: "GET",
+    // Forward cookies so the Django session (Google login) is honored.
+    headers: {
+      cookie: cookieHeader,
+      accept: "application/json",
+    },
+    credentials: "include",
+  });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (!res.ok) {
+    const error = await res.text();
+    return NextResponse.json({ error }, { status: res.status });
+  }
 
+  const data = await res.json();
   return NextResponse.json({ profile: data });
 }
 
 export async function PATCH(request: Request) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-
   const body = await request.json();
-  const { business_name, business_address, industry, tone_of_voice, phone, description, full_name, website_url } = body;
+  const backendBase =
+    process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
 
-  const { error } = await supabase
-    .from("profiles")
-    .update({
-      business_name,
-      business_address,
-      industry,
-      tone_of_voice,
-      phone,
-      description,
-      full_name,
-      website_url,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", user.id);
+  const cookieHeader = cookies().toString();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  const res = await fetch(`${backendBase}/api/business-profile/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      cookie: cookieHeader,
+      accept: "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(body),
+  });
 
-  return NextResponse.json({ success: true });
+  if (!res.ok) {
+    const error = await res.text();
+    return NextResponse.json({ error }, { status: res.status });
+  }
+
+  const data = await res.json();
+  return NextResponse.json({ profile: data });
 }

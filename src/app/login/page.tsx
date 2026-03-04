@@ -75,12 +75,10 @@ function AuthPage() {
   };
 
   const handleGoogleLogin = async () => {
-    const supabase = createClient();
-    const redirectTo = `${window.location.origin}/api/auth/callback?next=/app`;
-    await supabase.auth.signInWithOAuth({ 
-      provider: "google", 
-      options: { redirectTo } 
-    });
+    const backendBase =
+      process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
+    const next = `${window.location.origin}/app`;
+    window.location.href = `${backendBase}/auth/google/login/?next=${encodeURIComponent(next)}`;
   };
 
   const handleForgotPassword = async () => {

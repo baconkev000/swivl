@@ -107,7 +107,7 @@ const agentIntegrations: Record<string, { name: string; logo: React.FC<{ size?: 
       name: "Google Analytics",
       logo: GoogleAnalyticsLogo,
       description: "Required to monitor organic traffic, sessions, and conversions.",
-      required: true,
+      required: false,
     },
     {
       name: "WordPress",
@@ -563,10 +563,27 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
   const [showVisitors, setShowVisitors] = useState(true);
   const [showReviews, setShowReviews] = useState(true);
   const [showLeads, setShowLeads] = useState(true);
+  const [seoGscConnected, setSeoGscConnected] = useState<boolean>(false);
 
   const firstName = profile?.full_name?.split(" ")[0] ?? null;
   const bizName = profile?.business_name ?? null;
   const _industry = profile?.industry ?? null;
+
+  useEffect(() => {
+    const loadSeoGscStatus = async () => {
+      try {
+        const res = await fetch("/api/integrations/google-search-console/status");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (typeof data.connected === "boolean") {
+          setSeoGscConnected(data.connected);
+        }
+      } catch {
+        // Ignore errors; leave default false.
+      }
+    };
+    loadSeoGscStatus();
+  }, []);
 
   return (
     <div className="flex-1 px-5 pt-3 pb-8 md:p-8 space-y-6" style={{ backgroundColor: "#f5f5f7" }}>
@@ -602,7 +619,7 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
             lightColor="#EFF6FF"
             onConnect={onConnect}
             onOpenChat={onOpenChat}
-            connectedCount={2}
+            connectedCount={seoGscConnected ? 1 : 0}
             totalCount={4}
             activeTasks={[
               "Writing conversion post: \"Top 5 Signs You Need a Plumber\"",
@@ -853,9 +870,9 @@ const allIntegrations = [
   },
 ];
 
-// Simulated connected state (in a real app, this would come from the backend)
+// Connected state; defaults come from UI assumptions and are refined from the backend.
 const initialConnected: Record<string, boolean> = {
-  "seo-Google Search Console": true,
+  "seo-Google Search Console": false,
   "seo-Google Analytics": true,
   "seo-WordPress": false,
   "seo-Semrush": false,
@@ -873,6 +890,26 @@ function IntegrationsView({ focusAgent }: { focusAgent?: string }) {
   const [connected, setConnected] = useState<Record<string, boolean>>(initialConnected);
   const [connecting, setConnecting] = useState<string | null>(null);
 
+  // On mount, fetch real Google Search Console connection status for the current user.
+  useEffect(() => {
+    const loadGscStatus = async () => {
+      try {
+        const res = await fetch("/api/integrations/google-search-console/status");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (typeof data.connected === "boolean") {
+          setConnected((prev) => ({
+            ...prev,
+            "seo-Google Search Console": data.connected,
+          }));
+        }
+      } catch {
+        // Ignore errors; leave default state.
+      }
+    };
+    loadGscStatus();
+  }, []);
+
   const toggle = (agent: string, name: string) => {
     const key = `${agent}-${name}`;
     if (connected[key]) {
@@ -884,6 +921,22 @@ function IntegrationsView({ focusAgent }: { focusAgent?: string }) {
         setConnecting(null);
       }, 1200);
     }
+  };
+
+  const handleIntegrationClick = (agent: string, name: string) => {
+    const key = `${agent}-${name}`;
+    // Special-case Google Search Console: start OAuth flow via backend
+    if (key === "seo-Google Search Console") {
+      const backendBase =
+        process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
+      const next = `${window.location.origin}/app?tab=integrations`;
+      window.location.href = `${backendBase}/integrations/google-search-console/start/?next=${encodeURIComponent(
+        next,
+      )}`;
+      return;
+    }
+    // Other integrations remain simulated toggles for now.
+    toggle(agent, name);
   };
 
   return (
@@ -978,7 +1031,7 @@ function IntegrationsView({ focusAgent }: { focusAgent?: string }) {
                       <div className="shrink-0">
                         {isConnected ? (
                           <button
-                            onClick={() => toggle(agent, integ.name)}
+                            onClick={() => handleIntegrationClick(agent, integ.name)}
                             className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-medium transition-all"
                             style={{ backgroundColor: agentLight, color: agentColor }}
                             onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
@@ -989,7 +1042,7 @@ function IntegrationsView({ focusAgent }: { focusAgent?: string }) {
                           </button>
                         ) : (
                           <button
-                            onClick={() => toggle(agent, integ.name)}
+                            onClick={() => handleIntegrationClick(agent, integ.name)}
                             disabled={isConnecting}
                             className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-medium text-white transition-all disabled:opacity-60"
                             style={{ backgroundColor: agentColor }}
