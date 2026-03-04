@@ -1354,26 +1354,8 @@ const agentDetailData: Record<string, {
   stats: { label: string; value: string; sub: string; icon: React.FC<{ size?: number; className?: string }> }[];
 }> = {
   seo: {
-    activity: [
-      { time: "2 min ago",  text: 'Published "5 Reasons to Choose a Local Plumber" — targeting "emergency plumber near me" (HIGH intent)', type: "done" },
-      { time: "18 min ago", text: "Sent 28 high-intent keywords to Ads agent for campaign targeting — expected ROAS uplift +18%", type: "done" },
-      { time: "34 min ago", text: "Fixed 12 broken internal links and resubmitted affected pages to Google Search Console", type: "done" },
-      { time: "1 hr ago",   text: "Detected crawl error on /services/hvac — investigating. Flagging to Ads agent (may hurt landing page CVR)", type: "alert" },
-      { time: "2 hr ago",   text: "Competitor gap analysis: 340 high-intent keywords found. Top 20 sent to Ads agent for immediate targeting", type: "done" },
-      { time: "3 hr ago",   text: "Sent top 5 customer objections from search data to Reviews agent — for response tone calibration", type: "done" },
-      { time: "Yesterday",  text: 'Published "How to Pick the Best HVAC Company Near You" — 340 organic visits so far, 12 conversions', type: "done" },
-      { time: "Yesterday",  text: "Built 4 new backlinks. Domain Authority: 58 → 62. Conversion-focused pages prioritised.", type: "done" },
-    ],
-    tasks: [
-      { label: "Writing conversion-focused blog posts (targeting buyer-intent keywords)", status: "working" },
-      { label: "Mapping competitor revenue keywords — 340 found, 20 sent to Ads agent", status: "working" },
-      { label: "Building 12 programmatic service + location pages (high transactional intent)", status: "working" },
-      { label: "Flagging landing page issues to Ads agent (CVR improvement)", status: "pending" },
-      { label: "Published 12 new conversion-focused blog posts", status: "done" },
-      { label: "Fixed 48 broken internal links", status: "done" },
-      { label: "Optimised meta tags on 85 pages", status: "done" },
-      { label: "Built 34 high-quality backlinks — DA now 62", status: "done" },
-    ],
+    activity: [],
+    tasks: [],
     stats: [
       { label: "Organic Visitors This Month", value: "1,240", sub: "+18% this month", icon: Eye },
       { label: "Keywords ranking", value: "248", sub: "34 in top 3 positions", icon: TrendingUp },
@@ -1381,26 +1363,8 @@ const agentDetailData: Record<string, {
     ],
   },
   reviews: {
-    activity: [
-      { time: "4 min ago",  text: "Replied to 5-star Google review from Sarah M. — reinforced 'fast response time' (82x mentioned — strengthening brand signal)", type: "done" },
-      { time: "22 min ago", text: "Sent 28 review request SMS to recent customers. Optimised for 16.8% conversion rate.", type: "done" },
-      { time: "1 hr ago",   text: "1-star review from John D. — MEDIUM risk. Response HELD for approval. Draft: calm, composed, 3/10 energy.", type: "alert" },
-      { time: "2 hr ago",   text: "Star rating improved 4.7 → 4.8 on Google. Trust increasing = conversion rate increasing.", type: "done" },
-      { time: "3 hr ago",   text: "Sent 'fast service' and 'friendly staff' praise themes to Ads agent — converted to 3 ad creative angles.", type: "done" },
-      { time: "4 hr ago",   text: "Sent 'wait time' recurring complaint to SEO agent — flagged for landing page content improvement.", type: "done" },
-      { time: "Yesterday",  text: "Responded to 6 Yelp reviews — all within 8 minutes of posting. Industry avg: 3+ days.", type: "done" },
-      { time: "2 days ago", text: "Monthly sentiment report: 91% positive. 'Fast service' and 'friendly staff' are your dominant praise themes.", type: "done" },
-    ],
-    tasks: [
-      { label: "Monitoring Google, Yelp, Facebook & Trustpilot — responding within 15 min", status: "working" },
-      { label: "Sending automated review requests after every completed service", status: "working" },
-      { label: "Drafting recovery response for John D. 1-star (awaiting approval)", status: "pending" },
-      { label: "Sharing praise themes with Ads agent for creative production", status: "working" },
-      { label: "Responded to 47 reviews this month — 8 min avg response time", status: "done" },
-      { label: "Sent 280 review request campaigns — 16.8% conversion rate", status: "done" },
-      { label: "Star rating improved 4.3 → 4.8 over 6 months", status: "done" },
-      { label: "Escalated 2 high-risk reviews — both held for human approval", status: "done" },
-    ],
+    activity: [],
+    tasks: [],
     stats: [
       { label: "Star Rating", value: "4.8★", sub: "Up from 4.3 — trust is growing", icon: Star },
       { label: "Total Reviews", value: "312", sub: "+47 this month", icon: MessageSquare },
@@ -1408,24 +1372,8 @@ const agentDetailData: Record<string, {
     ],
   },
   ads: {
-    activity: [
-      { time: "1 hr ago",   text: "Loaded 28 high-intent keywords from SEO agent into Google Search — 6 new ad groups created", type: "done" },
-      { time: "2 hr ago",   text: "Built 3 new ad creatives using praise themes from Reviews agent: 'fast service', 'friendly team', 'great value'", type: "done" },
-      { time: "3 hr ago",   text: "TikTok ROAS dropped to 2.1x — below threshold. Testing new hooks before scaling.", type: "alert" },
-      { time: "4 hr ago",   text: "Paused underperforming Meta ad set. Reallocated $340 to Google Search (6.8x ROAS)", type: "done" },
-      { time: "5 hr ago",   text: "Added 28 negative keywords from SEO data — projected -22% wasted spend", type: "done" },
-      { time: "Yesterday",  text: "Flagged high CTR / low CVR on /services — sent landing page feedback to SEO agent for headline fix", type: "done" },
-      { time: "Yesterday",  text: "3 new customers acquired via Google Search. CPA: $3.80 — below $4.20 monthly avg.", type: "done" },
-    ],
-    tasks: [
-      { label: "Scaling Google Search (6.8x ROAS) — increasing budget +20%", status: "working" },
-      { label: "A/B testing creatives built from Reviews agent praise language", status: "working" },
-      { label: "Targeting 28 SEO keywords in new Google campaigns", status: "working" },
-      { label: "Black Friday retargeting campaign — awaiting approval", status: "pending" },
-      { label: "Reduced CPA from $8.50 → $4.20 using SEO + reviews data", status: "done" },
-      { label: "Paused Snapchat at 1.4x ROAS — below profitability threshold", status: "done" },
-      { label: "Expanded Meta lookalike audience — CPA improved 38%", status: "done" },
-    ],
+    activity: [],
+    tasks: [],
     stats: [
       { label: "New Customers/mo", value: "28", sub: "+12 vs last month", icon: Zap },
       { label: "Avg ROAS", value: "4.8x", sub: "Google Search: 6.8x", icon: TrendingUp },
@@ -1633,7 +1581,7 @@ function SEOAgentOverview({
         </div>
 
         {/* Content Pipeline */}
-        <div className="bg-white rounded-3xl overflow-hidden">
+        {/* <div className="bg-white rounded-3xl overflow-hidden">
           <div className="px-6 py-5" style={{ borderBottom: "1px solid #f5f5f7" }}>
             <h3 className="text-[15px] font-semibold text-black">Content Pipeline</h3>
             <p className="text-[12px] text-black mt-0.5" style={{ opacity: 0.4 }}>Conversion-focused — every post targets buyer intent</p>
@@ -1666,7 +1614,7 @@ function SEOAgentOverview({
               + Request a new post →
             </button>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Cross-Agent Intelligence */}
@@ -1702,7 +1650,7 @@ function SEOAgentOverview({
       </div>
 
       {/* Tasks + Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-white rounded-3xl overflow-hidden">
           <div className="px-6 py-5" style={{ borderBottom: "1px solid #f5f5f7" }}>
             <h3 className="text-[15px] font-semibold text-black">Active Tasks</h3>
@@ -1748,7 +1696,7 @@ function SEOAgentOverview({
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Quick Actions */}
       <div className="bg-white rounded-3xl p-6">
@@ -1929,7 +1877,7 @@ function AdsAgentOverview({
       </div>
 
       {/* Tasks + Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-white rounded-3xl overflow-hidden">
           <div className="px-6 py-5" style={{ borderBottom: "1px solid #f5f5f7" }}>
             <h3 className="text-[15px] font-semibold text-black">Active Tasks</h3>
@@ -1975,7 +1923,7 @@ function AdsAgentOverview({
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Quick Actions */}
       <div className="bg-white rounded-3xl p-6">
@@ -2013,13 +1961,7 @@ function ReviewsAgentOverview({
   const [requestSent, setRequestSent] = useState(false);
   const [requestTone, setRequestTone] = useState<"friendly" | "professional" | "luxury">("friendly");
 
-  const recentReviews = [
-    { id: 1, author: "Sarah M.", platform: "Google", stars: 5, time: "4 min ago", text: "Incredible service — they were there within the hour and fixed everything. Couldn't be happier!", risk: "LOW", tone: "Happy", responded: true, response: "Thank you so much, Sarah! We're thrilled we could help quickly. Looking forward to being your go-to team!" },
-    { id: 2, author: "John D.", platform: "Google", stars: 1, time: "1 hr ago", text: "Waited 3 hours, no call ahead. This is completely unacceptable.", risk: "MEDIUM", tone: "Frustrated", responded: false, response: "" },
-    { id: 3, author: "K. Smith", platform: "Yelp", stars: 2, time: "3 hr ago", text: "Service was okay but the price felt higher than expected.", risk: "LOW", tone: "Disappointed", responded: true, response: "Thank you for your feedback, K. We understand price is important — please reach out and we'd love to make this right." },
-    { id: 4, author: "Tom R.", platform: "Google", stars: 4, time: "Yesterday", text: "Really good experience overall. Friendly team and clean work.", risk: "LOW", tone: "Impressed", responded: true, response: "Thanks Tom! We appreciate you taking the time to share this. See you next time!" },
-    { id: 5, author: "Anonymous", platform: "Google", stars: 1, time: "3 hrs ago", text: "I'm going to report this to the BBB and consult my lawyer if I don't hear back.", risk: "HIGH", tone: "Angry", responded: false, response: "" },
-  ];
+  const recentReviews: { id: number; author: string; platform: string; stars: number; time: string; text: string; risk: string; tone: string; responded: boolean; response: string }[] = [];
 
   const requestMessages = {
     friendly: "Hey [Name], thank you for choosing us! If you have a moment, we'd love your honest feedback — it means the world: {{review_link}} 🙏",
@@ -2092,7 +2034,11 @@ function ReviewsAgentOverview({
             </div>
           </div>
           <div className="divide-y" style={{ borderColor: "#f5f5f7" }}>
-            {recentReviews.map((r) => (
+            {recentReviews.length === 0 ? (
+              <div className="px-6 py-8 text-center">
+                <p className="text-[13px] text-black" style={{ opacity: 0.4 }}>No reviews yet</p>
+              </div>
+            ) : recentReviews.map((r) => (
               <div
                 key={r.id}
                 className="px-6 py-4 transition-colors"
@@ -2279,7 +2225,7 @@ function ReviewsAgentOverview({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
         {/* Tasks */}
-        <div className="bg-white rounded-3xl overflow-hidden">
+        {/* <div className="bg-white rounded-3xl overflow-hidden">
           <div className="px-6 py-5" style={{ borderBottom: "1px solid #f5f5f7" }}>
             <h3 className="text-[15px] font-semibold text-black">Active Tasks</h3>
             <p className="text-[12px] text-black mt-0.5" style={{ opacity: 0.4 }}>What I&apos;m working on right now</p>
@@ -2301,7 +2247,7 @@ function ReviewsAgentOverview({
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Activity */}
         <div className="bg-white rounded-3xl overflow-hidden">
@@ -2309,29 +2255,35 @@ function ReviewsAgentOverview({
             <h3 className="text-[15px] font-semibold text-black">Activity Log</h3>
             <p className="text-[12px] text-black mt-0.5" style={{ opacity: 0.4 }}>Everything I&apos;ve done for your reputation</p>
           </div>
-          <div className="divide-y" style={{ borderColor: "#f5f5f7" }}>
-            {detail.activity.map((item, i) => (
-              <div
-                key={i}
-                className="flex items-start gap-3 px-6 py-4 transition-colors"
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#F9F9F9")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-              >
-                <div
-                  className="w-2 h-2 rounded-full mt-[6px] shrink-0"
-                  style={{ backgroundColor: item.type === "alert" ? "#F59E0B" : "#1d1d1f", opacity: item.type === "done" ? 0.6 : 1 }}
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] text-black leading-relaxed" style={{ opacity: 0.75 }}>{item.text}</p>
-                  {item.type === "alert" && (
-                    <span className="inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#FFF7ED", color: "#C2410C" }}>
-                      Needs attention
-                    </span>
-                  )}
-                </div>
-                <span className="text-[11px] shrink-0 mt-0.5 whitespace-nowrap text-black" style={{ opacity: 0.3 }}>{item.time}</span>
+          <div className="px-6 py-8 text-center">
+            {detail.activity.length === 0 ? (
+              <p className="text-[13px] text-black" style={{ opacity: 0.4 }}>No activity yet</p>
+            ) : (
+              <div className="divide-y" style={{ borderColor: "#f5f5f7" }}>
+                {detail.activity.map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex items-start gap-3 px-0 py-4 transition-colors"
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#F9F9F9")}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                  >
+                    <div
+                      className="w-2 h-2 rounded-full mt-[6px] shrink-0"
+                      style={{ backgroundColor: item.type === "alert" ? "#F59E0B" : "#1d1d1f", opacity: item.type === "done" ? 0.6 : 1 }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] text-black leading-relaxed" style={{ opacity: 0.75 }}>{item.text}</p>
+                      {item.type === "alert" && (
+                        <span className="inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#FFF7ED", color: "#C2410C" }}>
+                          Needs attention
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[11px] shrink-0 mt-0.5 whitespace-nowrap text-black" style={{ opacity: 0.3 }}>{item.time}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
@@ -2688,41 +2640,47 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
                 <h3 className="text-[15px] font-semibold text-black">Tasks</h3>
                 <p className="text-[12px] text-black mt-0.5" style={{ opacity: 0.4 }}>What {agentName} is working on</p>
               </div>
-              <div className="divide-y" style={{ borderColor: "#f5f5f7" }}>
-                {detail.tasks.map((task, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 px-6 py-4 transition-colors"
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#F9F9F9")}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                  >
-                    {task.status === "done" && (
-                      <CheckCircle2 size={16} className="shrink-0" style={{ color: cfg.color, opacity: 0.7 }} />
-                    )}
-                    {task.status === "working" && (
-                      <div className="w-4 h-4 rounded-full border-2 shrink-0 animate-spin" style={{ borderColor: `${cfg.color}40`, borderTopColor: cfg.color }} />
-                    )}
-                    {task.status === "pending" && (
-                      <Circle size={16} className="shrink-0 text-black" style={{ opacity: 0.25 }} />
-                    )}
-                    <span
-                      className="text-[13px] text-black flex-1"
-                      style={{ opacity: task.status === "done" ? 0.35 : 0.8, textDecoration: task.status === "done" ? "line-through" : "none" }}
-                    >
-                      {task.label}
-                    </span>
-                    {task.status === "working" && (
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0" style={{ backgroundColor: cfg.light, color: cfg.color }}>
-                        In progress
-                      </span>
-                    )}
-                    {task.status === "pending" && (
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0" style={{ backgroundColor: "#FFF7ED", color: "#C2410C" }}>
-                        Pending
-                      </span>
-                    )}
+              <div className="px-6 py-8 text-center">
+                {detail.tasks.length === 0 ? (
+                  <p className="text-[13px] text-black" style={{ opacity: 0.4 }}>No tasks yet</p>
+                ) : (
+                  <div className="divide-y" style={{ borderColor: "#f5f5f7" }}>
+                    {detail.tasks.map((task, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-3 px-0 py-4 transition-colors"
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#F9F9F9")}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                      >
+                        {task.status === "done" && (
+                          <CheckCircle2 size={16} className="shrink-0" style={{ color: cfg.color, opacity: 0.7 }} />
+                        )}
+                        {task.status === "working" && (
+                          <div className="w-4 h-4 rounded-full border-2 shrink-0 animate-spin" style={{ borderColor: `${cfg.color}40`, borderTopColor: cfg.color }} />
+                        )}
+                        {task.status === "pending" && (
+                          <Circle size={16} className="shrink-0 text-black" style={{ opacity: 0.25 }} />
+                        )}
+                        <span
+                          className="text-[13px] text-black flex-1"
+                          style={{ opacity: task.status === "done" ? 0.35 : 0.8, textDecoration: task.status === "done" ? "line-through" : "none" }}
+                        >
+                          {task.label}
+                        </span>
+                        {task.status === "working" && (
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0" style={{ backgroundColor: cfg.light, color: cfg.color }}>
+                            In progress
+                          </span>
+                        )}
+                        {task.status === "pending" && (
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0" style={{ backgroundColor: "#FFF7ED", color: "#C2410C" }}>
+                            Pending
+                          </span>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
             </div>
 
@@ -2732,32 +2690,38 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
                 <h3 className="text-[15px] font-semibold text-black">Activity</h3>
                 <p className="text-[12px] text-black mt-0.5" style={{ opacity: 0.4 }}>What {agentName} has been doing</p>
               </div>
-              <div className="divide-y" style={{ borderColor: "#f5f5f7" }}>
-                {detail.activity.map((item, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-3 px-6 py-4 transition-colors"
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#F9F9F9")}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                  >
-                    <div
-                      className="w-2 h-2 rounded-full mt-[6px] shrink-0"
-                      style={{
-                        backgroundColor: item.type === "alert" ? "#F59E0B" : item.type === "working" ? cfg.color : cfg.color,
-                        opacity: item.type === "working" ? 0.5 : 1,
-                      }}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[13px] text-black leading-relaxed" style={{ opacity: 0.8 }}>{item.text}</p>
-                      {item.type === "alert" && (
-                        <span className="inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#FFF7ED", color: "#C2410C" }}>
-                          Needs attention
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-[11px] shrink-0 mt-0.5 whitespace-nowrap text-black" style={{ opacity: 0.35 }}>{item.time}</span>
+              <div className="px-6 py-8 text-center">
+                {detail.activity.length === 0 ? (
+                  <p className="text-[13px] text-black" style={{ opacity: 0.4 }}>No activity yet</p>
+                ) : (
+                  <div className="divide-y" style={{ borderColor: "#f5f5f7" }}>
+                    {detail.activity.map((item, i) => (
+                      <div
+                        key={i}
+                        className="flex items-start gap-3 px-0 py-4 transition-colors"
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#F9F9F9")}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                      >
+                        <div
+                          className="w-2 h-2 rounded-full mt-[6px] shrink-0"
+                          style={{
+                            backgroundColor: item.type === "alert" ? "#F59E0B" : item.type === "working" ? cfg.color : cfg.color,
+                            opacity: item.type === "working" ? 0.5 : 1,
+                          }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[13px] text-black leading-relaxed" style={{ opacity: 0.8 }}>{item.text}</p>
+                          {item.type === "alert" && (
+                            <span className="inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#FFF7ED", color: "#C2410C" }}>
+                              Needs attention
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[11px] shrink-0 mt-0.5 whitespace-nowrap text-black" style={{ opacity: 0.35 }}>{item.time}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>
@@ -3616,17 +3580,27 @@ function TasksView() {
   );
 }
 
+const VALID_NAV_IDS = ["dashboard", "tasks", "files", "integrations", "settings"] as const;
+const VALID_AGENTS = ["seo", "ads", "reviews"] as const;
+
 function AppContent() {
-  const [activeNav, setActiveNav] = useState("dashboard");
-  const [activeAgent, setActiveAgent] = useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [activeNav, setActiveNav] = useState(() => {
+    const tab = searchParams.get("tab");
+    return tab && VALID_NAV_IDS.includes(tab as typeof VALID_NAV_IDS[number]) ? tab : "dashboard";
+  });
+  const [activeAgent, setActiveAgent] = useState<string | null>(() => {
+    const agent = searchParams.get("agent");
+    return agent && VALID_AGENTS.includes(agent as typeof VALID_AGENTS[number]) ? agent : null;
+  });
   const [focusAgent, setFocusAgent] = useState<string | undefined>(undefined);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
   const [readNotifs, setReadNotifs] = useState<Set<string>>(new Set());
-  const router = useRouter();
-  const searchParams = useSearchParams();
 
   // Pending approval notifications (used for Tasks nav badge)
   const notifications = approvalTasks.map((t) => ({
@@ -3681,10 +3655,14 @@ function AppContent() {
 
   useEffect(() => {
     const agent = searchParams.get("agent");
-    if (agent && ["seo", "ads", "reviews"].includes(agent)) {
+    if (agent && VALID_AGENTS.includes(agent as typeof VALID_AGENTS[number])) {
       setActiveAgent(agent);
     } else {
       setActiveAgent(null);
+    }
+    const tab = searchParams.get("tab");
+    if (tab && VALID_NAV_IDS.includes(tab as typeof VALID_NAV_IDS[number])) {
+      setActiveNav(tab);
     }
   }, [searchParams]);
 
@@ -3704,6 +3682,7 @@ function AppContent() {
     setActiveNav(id);
     const params = new URLSearchParams(searchParams.toString());
     params.delete("agent");
+    params.set("tab", id);
     router.push(`/app?${params.toString()}`);
     setSidebarOpen(false);
   };
