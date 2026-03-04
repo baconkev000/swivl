@@ -10,7 +10,8 @@ export async function POST() {
   // Log out from Django/Google SSO session on the backend
   const backendBase =
     process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
-  const cookieHeader = cookies().toString();
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore.toString();
 
   try {
     await fetch(`${backendBase}/api/logout/`, {

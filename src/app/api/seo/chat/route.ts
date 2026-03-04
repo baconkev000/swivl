@@ -5,7 +5,8 @@ export async function POST(request: Request) {
   const backendBase =
     process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
 
-  const cookieHeader = cookies().toString();
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore.toString();
   const body = await request.json();
 
   const res = await fetch(`${backendBase}/api/seo/chat/`, {

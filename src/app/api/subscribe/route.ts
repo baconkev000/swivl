@@ -61,7 +61,8 @@ export async function GET() {
     // Fall back to Django/Google-authenticated session: check backend /api/users/me/.
     const backendBase =
       process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
-    const cookieHeader = cookies().toString();
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.toString();
 
     try {
       const res = await fetch(`${backendBase}/api/users/me/`, {

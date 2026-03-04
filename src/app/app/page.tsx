@@ -277,51 +277,15 @@ function TaskRow({ text, variant }: { text: string; variant: "lead" | "progress"
 /* ─── Tasks data ─── */
 const allTasks = {
   inProgress: [
-    "Reviewing previous ad performance",
-    "Fixing 34 of your existing blog posts",
-    "Creating TikTok ad variations",
-    "Optimizing Meta audience segments",
-    "Updating 18 existing blog posts",
-    "Building new contact page",
-    "Analyzing competitor keyword gaps",
-    "Setting up conversion tracking",
   ],
   completed: [
-    "Adding programmatic landing pages",
-    "Analyzed SEO strategy",
-    "Published 12 new blog posts",
-    "Fixed 48 broken internal links",
-    "Launched 3 new Google campaigns",
-    "Redesigned Meta ad creatives",
-    "Optimized meta tags on 85 pages",
-    "Created content for 15 programmatic pages",
-    "Built 34 high-quality backlinks",
-    "Improved Core Web Vitals scores",
-    "Set up Google Business Profile",
-    "Reduced page load time by 2.1s",
   ],
   pending: [
-    "Review new landing page design",
-    "Approve blog content batch #4",
-    "Review Black Friday campaign",
-    "Approve Google Search terms",
-    "Check new homepage hero",
-    "Review pricing page redesign",
   ],
 };
 
 /* ─── Files data ─── */
 const files = [
-  { name: "seo Strategy Q1 2025.pdf", type: "PDF", size: "2.4 MB", date: "Jan 15, 2025", agent: "seo" },
-  { name: "Ad Creative Pack - Holiday.zip", type: "ZIP", size: "48 MB", date: "Jan 12, 2025", agent: "ads" },
-  { name: "Keyword Research Report.xlsx", type: "XLSX", size: "1.1 MB", date: "Jan 10, 2025", agent: "seo" },
-  { name: "Landing Page Wireframe.fig", type: "FIG", size: "8.2 MB", date: "Jan 8, 2025", agent: "website" },
-  { name: "Monthly Performance Report.pdf", type: "PDF", size: "3.6 MB", date: "Jan 5, 2025", agent: "seo" },
-  { name: "TikTok Ad Variations.mp4", type: "MP4", size: "124 MB", date: "Jan 3, 2025", agent: "ads" },
-  { name: "Blog Content Batch #3.docx", type: "DOCX", size: "540 KB", date: "Dec 28, 2024", agent: "seo" },
-  { name: "Homepage Redesign V2.fig", type: "FIG", size: "12.4 MB", date: "Dec 22, 2024", agent: "website" },
-  { name: "Competitor Analysis.pdf", type: "PDF", size: "4.8 MB", date: "Dec 18, 2024", agent: "seo" },
-  { name: "Meta Campaign Assets.zip", type: "ZIP", size: "36 MB", date: "Dec 15, 2024", agent: "ads" },
 ];
 
 /* ─── Mini sparkline ─── */

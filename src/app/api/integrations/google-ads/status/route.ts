@@ -5,7 +5,8 @@ export async function GET() {
   const backendBase =
     process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
 
-  const cookieHeader = cookies().toString();
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore.toString();
 
   const res = await fetch(
     `${backendBase}/api/integrations/google-ads/status/`,
