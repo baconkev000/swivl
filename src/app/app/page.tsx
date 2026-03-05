@@ -127,14 +127,14 @@ const agentIntegrations: Record<string, { name: string; logo: React.FC<{ size?: 
     {
       name: "Google Business Profile",
       logo: GoogleBusinessLogo,
-      description: "Required to respond to reviews and keep your listing up to date.",
-      required: true,
+      description: "Respond to reviews and keep your listing up to date.",
+      required: false,
     },
     {
       name: "Yelp",
       logo: YelpLogo,
-      description: "Allows reviews to monitor and respond to Yelp reviews on your behalf.",
-      required: true,
+      description: "Monitor and respond to Yelp reviews on your behalf.",
+      required: false,
     },
     {
       name: "Facebook",
@@ -330,6 +330,8 @@ interface AgentCardProps {
   onOpenChat: (agent: string) => void;
   connectedCount: number;
   totalCount: number;
+  /** When set, data is shown when connectedCount >= this (e.g. "at least one" for reviews). */
+  minIntegrationsToShowData?: number;
   activeTasks: string[];
 }
 
@@ -348,10 +350,12 @@ function AgentCard({
   onOpenChat,
   connectedCount,
   totalCount,
+  minIntegrationsToShowData,
   activeTasks,
 }: AgentCardProps) {
   const requiredIntegrations = agentIntegrations[name]?.filter((i) => i.required) ?? [];
-  const allConnected = connectedCount >= requiredIntegrations.length;
+  const minRequired = minIntegrationsToShowData ?? requiredIntegrations.length;
+  const allConnected = connectedCount >= minRequired;
 
     return (
       <div
@@ -462,11 +466,13 @@ function AgentCard({
               </div>
               <p className="text-[13px] font-semibold text-black mb-1">Connect to activate {name}</p>
               <p className="text-[11px] text-black leading-relaxed mb-4" style={{ opacity: 0.45 }}>
-                {requiredIntegrations.map((i) => i.name).join(" and ")} required to start
+                {minIntegrationsToShowData && requiredIntegrations.length === 0
+                  ? `Connect at least one source to see data`
+                  : `${requiredIntegrations.map((i) => i.name).join(" and ")} required to start`}
               </p>
-              {/* Required integration logos */}
+              {/* Integration logos: show required, or first 3 when "at least one" */}
               <div className="flex items-center justify-center gap-2 mb-4">
-                {requiredIntegrations.map((integ, idx) => (
+                {(requiredIntegrations.length > 0 ? requiredIntegrations : agentIntegrations[name]?.slice(0, 3) ?? []).map((integ, idx) => (
                   <div key={idx} className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ backgroundColor: "#f5f5f7" }}>
                     <integ.logo size={20} />
                   </div>
@@ -524,6 +530,17 @@ const activityFeed = [
   { agent: "reviews", time: "Yesterday",  text: "Star rating 4.7 → 4.8. Trust rising. Close rate increasing. CAC dropping. Growth System is working." },
 ];
 
+type ReviewsOverview = {
+  star_rating: number;
+  previous_star_rating: number;
+  total_reviews: number;
+  new_reviews_this_month: number;
+  response_rate_pct: number;
+  industry_avg_response_pct: number;
+  requests_sent: number;
+  conversion_pct: number;
+} | null;
+
 function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | null; onConnect: (agent: string) => void; onOpenChat: (agent: string) => void }) {
   const [showVisitors, setShowVisitors] = useState(true);
   const [showReviews, setShowReviews] = useState(true);
@@ -535,6 +552,8 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
     top3_positions: number;
     organic_growth_pct: number;
   } | null>(null);
+  const [reviewsGbpConnected, setReviewsGbpConnected] = useState<boolean>(false);
+  const [reviewsOverview, setReviewsOverview] = useState<ReviewsOverview>(null);
 
   const firstName = profile?.full_name?.split(" ")[0] ?? null;
   const bizName = profile?.business_name ?? null;
@@ -566,6 +585,40 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
     };
     loadSeoGscStatus();
   }, []);
+
+  useEffect(() => {
+    const loadReviews = async () => {
+      try {
+        const res = await fetch("/api/integrations/google-business-profile/status");
+        if (!res.ok) return;
+        const data = await res.json();
+        const gbpConnected = typeof data.connected === "boolean" && data.connected;
+        setReviewsGbpConnected(gbpConnected);
+        if (gbpConnected) {
+          const overviewRes = await fetch("/api/reviews/overview");
+          if (overviewRes.ok) {
+            const o = await overviewRes.json();
+            setReviewsOverview({
+              star_rating: o.star_rating ?? 0,
+              previous_star_rating: o.previous_star_rating ?? 0,
+              total_reviews: o.total_reviews ?? 0,
+              new_reviews_this_month: o.new_reviews_this_month ?? 0,
+              response_rate_pct: o.response_rate_pct ?? 0,
+              industry_avg_response_pct: o.industry_avg_response_pct ?? 45,
+              requests_sent: o.requests_sent ?? 0,
+              conversion_pct: o.conversion_pct ?? 0,
+            });
+          }
+        }
+      } catch {
+        // Ignore errors.
+      }
+    };
+    loadReviews();
+  }, []);
+
+  const reviewsConnectedCount = reviewsGbpConnected ? 1 : 0;
+  const reviewsHasData = reviewsConnectedCount >= 1 && reviewsOverview !== null;
 
   return (
     <div className="flex-1 px-5 pt-3 pb-8 md:p-8 space-y-6" style={{ backgroundColor: "#f5f5f7" }}>
@@ -632,20 +685,43 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
           role="Trust & Conversion Operator — owns public perception and close rate"
           initial="r"
           headlineLabel="Star Rating"
-          headlineValue="4.8 ★"
+          headlineValue={
+            reviewsHasData
+              ? `${Number(reviewsOverview!.star_rating).toFixed(1)} ★`
+              : "—"
+          }
           stats={[
-            { label: "Total reviews", value: "312" },
-            { label: "New this week", value: "14" },
-            { label: "Response rate", value: "98%" },
+            {
+              label: "Total reviews",
+              value: reviewsHasData ? String(reviewsOverview!.total_reviews) : "—",
+            },
+            {
+              label: "Response rate",
+              value: reviewsHasData ? `${Number(reviewsOverview!.response_rate_pct).toFixed(0)}%` : "—",
+            },
+            {
+              label: "Requests sent",
+              value: reviewsHasData ? String(reviewsOverview!.requests_sent) : "—",
+            },
           ]}
-          sparkData={[4.4, 4.5, 4.5, 4.6, 4.6, 4.7, 4.8]}
-          status="Trust rising — 3 reviews responded to, 2 praise themes sent to Ads"
+          sparkData={
+            reviewsHasData
+              ? (() => {
+                  const prev = Number(reviewsOverview!.previous_star_rating);
+                  const curr = Number(reviewsOverview!.star_rating);
+                  if (prev > 0) return [prev, prev, prev, (prev + curr) / 2, curr, curr, curr];
+                  return [curr, curr, curr, curr, curr, curr, curr];
+                })()
+              : [0, 0, 0, 0, 0, 0, 0]
+          }
+          status={reviewsHasData ? `+${reviewsOverview!.new_reviews_this_month} this month · Industry avg response ${Number(reviewsOverview!.industry_avg_response_pct).toFixed(0)}%` : "Connect at least one review source to see data"}
           color="#1d1d1f"
           lightColor="#f5f5f7"
           onConnect={onConnect}
           onOpenChat={onOpenChat}
-          connectedCount={0}
+          connectedCount={reviewsConnectedCount}
           totalCount={4}
+          minIntegrationsToShowData={1}
           activeTasks={[
             "Drafting reply to 2-star review from John D.",
             "Sending praise themes 'fast service' → Ads agent",
@@ -754,7 +830,12 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pb-4">
         {[
             { label: "New Customers This Month", value: "28",    sub: "from Ads Agent campaigns",  icon: Zap },
-          { label: "Your Star Rating",          value: "4.8",  sub: "up from 4.6 last month",     icon: Star },
+          {
+            label: "Your Star Rating",
+            value: reviewsHasData ? `${Number(reviewsOverview!.star_rating).toFixed(1)}` : "—",
+            sub: reviewsHasData && reviewsOverview!.previous_star_rating > 0 ? `up from ${Number(reviewsOverview!.previous_star_rating).toFixed(1)} last month` : "Connect at least one review source (Google, Yelp, Facebook) to see data",
+            icon: Star,
+          },
           { label: "People Found You Online",   value: "1,240", sub: "via Google this month",     icon: Eye },
         ].map((s) => (
           <div key={s.label} className="bg-white rounded-3xl p-6 flex flex-col gap-3">
@@ -925,8 +1006,25 @@ function IntegrationsView({ focusAgent }: { focusAgent?: string }) {
       }
     };
 
+    const loadGbpStatus = async () => {
+      try {
+        const res = await fetch("/api/integrations/google-business-profile/status");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (typeof data.connected === "boolean") {
+          setConnected((prev) => ({
+            ...prev,
+            "reviews-Google Business Profile": data.connected,
+          }));
+        }
+      } catch {
+        // Ignore errors; leave default state.
+      }
+    };
+
     loadGscStatus();
     loadAdsStatus();
+    loadGbpStatus();
   }, []);
 
   const toggle = (agent: string, name: string) => {
@@ -960,6 +1058,16 @@ function IntegrationsView({ focusAgent }: { focusAgent?: string }) {
         process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
       const next = `${window.location.origin}/app?tab=integrations`;
       window.location.href = `${backendBase}/integrations/google-ads/start/?next=${encodeURIComponent(
+        next,
+      )}`;
+      return;
+    }
+    // Special-case Google Business Profile (Reviews Agent): start OAuth flow via backend
+    if (key === "reviews-Google Business Profile") {
+      const backendBase =
+        process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
+      const next = `${window.location.origin}/app?tab=integrations`;
+      window.location.href = `${backendBase}/integrations/google-business-profile/start/?next=${encodeURIComponent(
         next,
       )}`;
       return;
@@ -1912,6 +2020,17 @@ function AdsAgentOverview({
 }
 
 
+type ReviewsOverviewData = {
+  star_rating: number;
+  previous_star_rating: number;
+  total_reviews: number;
+  new_reviews_this_month: number;
+  response_rate_pct: number;
+  industry_avg_response_pct: number;
+  requests_sent: number;
+  conversion_pct: number;
+} | null;
+
 function ReviewsAgentOverview({
   cfg,
   detail,
@@ -1924,6 +2043,32 @@ function ReviewsAgentOverview({
   const [showDraftModal, setShowDraftModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
   const [requestTone, setRequestTone] = useState<"friendly" | "professional" | "luxury">("friendly");
+  const [reviewsOverview, setReviewsOverview] = useState<ReviewsOverviewData>(null);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch("/api/reviews/overview");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && typeof data.star_rating === "number") {
+          setReviewsOverview({
+            star_rating: data.star_rating,
+            previous_star_rating: data.previous_star_rating ?? 0,
+            total_reviews: data.total_reviews ?? 0,
+            new_reviews_this_month: data.new_reviews_this_month ?? 0,
+            response_rate_pct: data.response_rate_pct ?? 0,
+            industry_avg_response_pct: data.industry_avg_response_pct ?? 45,
+            requests_sent: data.requests_sent ?? 0,
+            conversion_pct: data.conversion_pct ?? 0,
+          });
+        }
+      } catch {
+        // leave null; use placeholders
+      }
+    };
+    load();
+  }, []);
 
   const recentReviews: { id: number; author: string; platform: string; stars: number; time: string; text: string; risk: string; tone: string; responded: boolean; response: string }[] = [];
 
@@ -1963,14 +2108,48 @@ function ReviewsAgentOverview({
   return (
     <div className="space-y-4">
 
-      {/* ── Part 1: Stats Row ── */}
+      {/* ── Part 1: Stats Row (actual data from API; placeholders only when no data loaded) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        {[
-          { label: "Star Rating",    value: "4.8★", sub: "↑ from 4.3",        icon: Star },
-          { label: "Total Reviews",  value: "312",  sub: "+47 this month",     icon: MessageSquare },
-          { label: "Response Rate",  value: "98%",  sub: "Industry avg: 45%",  icon: CheckCheck },
-          { label: "Requests Sent",  value: "280",  sub: "16.8% conversion",   icon: Repeat },
-        ].map((s) => (
+        {(
+          [
+            {
+              label: "Star Rating",
+              value: reviewsOverview !== null
+                ? `${Number(reviewsOverview.star_rating).toFixed(1)}★`
+                : "—",
+              sub: reviewsOverview !== null
+                ? (reviewsOverview.previous_star_rating > 0 ? `↑ from ${Number(reviewsOverview.previous_star_rating).toFixed(1)}` : "No previous data")
+                : "Connect Google Business Profile",
+              icon: Star,
+            },
+            {
+              label: "Total Reviews",
+              value: reviewsOverview !== null ? String(reviewsOverview.total_reviews) : "—",
+              sub: reviewsOverview !== null
+                ? `+${reviewsOverview.new_reviews_this_month} this month`
+                : "Connect Google Business Profile",
+              icon: MessageSquare,
+            },
+            {
+              label: "Response Rate",
+              value: reviewsOverview !== null
+                ? `${Number(reviewsOverview.response_rate_pct).toFixed(0)}%`
+                : "—",
+              sub: reviewsOverview !== null
+                ? `Industry avg: ${Number(reviewsOverview.industry_avg_response_pct).toFixed(0)}%`
+                : "Connect Google Business Profile",
+              icon: CheckCheck,
+            },
+            {
+              label: "Requests Sent",
+              value: reviewsOverview !== null ? String(reviewsOverview.requests_sent) : "—",
+              sub: reviewsOverview !== null
+                ? `${Number(reviewsOverview.conversion_pct).toFixed(1)}% conversion`
+                : "Connect Google Business Profile",
+              icon: Repeat,
+            },
+          ] as const
+        ).map((s) => (
           <div key={s.label} className="bg-white rounded-3xl p-6 flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <s.icon size={13} className="text-black" style={{ opacity: 0.4 } as React.CSSProperties} />
@@ -2423,7 +2602,6 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
                 ? {
                     ...c,
                     conversationId: newConversationId,
-                    // userMsg was already added optimistically above; only append agent reply
                     messages: [...c.messages, agentMsg],
                   }
                 : c
@@ -2431,23 +2609,63 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
           );
         })
         .catch(() => {
-          // On error, keep the user message but show a basic error reply.
           const agentMsg: ChatMessage = {
             role: "agent",
             text: "Sorry, I couldn't process that request right now. Please try again.",
           };
           setChats((prev) =>
             prev.map((c) =>
+              c.id === activeChatId ? { ...c, messages: [...c.messages, agentMsg] } : c
+            )
+          );
+        })
+        .finally(() => setTyping(false));
+    } else if (agentName === "reviews") {
+      // Use real Reviews agent backend (OpenAI, different system role, separate tables)
+      const currentThread = chats.find((c) => c.id === activeChatId);
+      const conversationId = currentThread?.conversationId ?? null;
+
+      setTyping(true);
+      fetch("/api/reviews/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: t, conversation_id: conversationId }),
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            const error = await res.text();
+            throw new Error(error || "Chat failed");
+          }
+          return res.json();
+        })
+        .then((data) => {
+          const replyText = data.reply as string;
+          const newConversationId = (data.conversation_id as number) ?? conversationId;
+          const agentMsg: ChatMessage = { role: "agent", text: replyText };
+          setChats((prev) =>
+            prev.map((c) =>
               c.id === activeChatId
-                // userMsg already present; just append error reply
-                ? { ...c, messages: [...c.messages, agentMsg] }
+                ? {
+                    ...c,
+                    conversationId: newConversationId,
+                    messages: [...c.messages, agentMsg],
+                  }
                 : c
             )
           );
         })
-        .finally(() => {
-          setTyping(false);
-        });
+        .catch(() => {
+          const agentMsg: ChatMessage = {
+            role: "agent",
+            text: "Sorry, I couldn't process that request right now. Please try again.",
+          };
+          setChats((prev) =>
+            prev.map((c) =>
+              c.id === activeChatId ? { ...c, messages: [...c.messages, agentMsg] } : c
+            )
+          );
+        })
+        .finally(() => setTyping(false));
     } else {
       // Keep existing scripted behaviour for other agents for now
       setTyping(true);
@@ -3660,6 +3878,7 @@ function AppContent() {
     setActiveAgent(null);
     setActiveNav("integrations");
     const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", "integrations");
     params.delete("agent");
     router.push(`/app?${params.toString()}`);
   };
