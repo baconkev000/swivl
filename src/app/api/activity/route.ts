@@ -1,17 +1,14 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-export async function GET(request: Request) {
+export async function GET() {
   const backendBase =
     process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
 
   const cookieStore = await cookies();
   const cookieHeader = cookieStore.toString();
 
-  const search = new URL(request.url).searchParams.toString();
-  const suffix = search ? `?${search}` : "";
-
-  const res = await fetch(`${backendBase}/api/seo/overview/${suffix}`, {
+  const res = await fetch(`${backendBase}/api/activity/`, {
     method: "GET",
     headers: {
       cookie: cookieHeader,
@@ -21,9 +18,8 @@ export async function GET(request: Request) {
   });
 
   if (!res.ok) {
-    const text = await res.text().catch(() => "");
     return NextResponse.json(
-      { error: text || "Failed to load SEO overview" },
+      { activities: [] },
       { status: res.status }
     );
   }
@@ -31,4 +27,3 @@ export async function GET(request: Request) {
   const data = await res.json();
   return NextResponse.json(data);
 }
-

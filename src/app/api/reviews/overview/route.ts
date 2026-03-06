@@ -1,14 +1,17 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-export async function GET() {
+export async function GET(request: Request) {
   const backendBase =
     process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
 
   const cookieStore = await cookies();
   const cookieHeader = cookieStore.toString();
 
-  const res = await fetch(`${backendBase}/api/reviews/overview/`, {
+  const search = new URL(request.url).searchParams.toString();
+  const suffix = search ? `?${search}` : "";
+
+  const res = await fetch(`${backendBase}/api/reviews/overview/${suffix}`, {
     method: "GET",
     headers: {
       cookie: cookieHeader,

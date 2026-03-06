@@ -333,6 +333,8 @@ interface AgentCardProps {
   /** When set, data is shown when connectedCount >= this (e.g. "at least one" for reviews). */
   minIntegrationsToShowData?: number;
   activeTasks: string[];
+  /** When true, show a loading message instead of data or connect CTA. */
+  loading?: boolean;
 }
 
 function AgentCard({
@@ -352,6 +354,7 @@ function AgentCard({
   totalCount,
   minIntegrationsToShowData,
   activeTasks,
+  loading = false,
 }: AgentCardProps) {
   const requiredIntegrations = agentIntegrations[name]?.filter((i) => i.required) ?? [];
   const minRequired = minIntegrationsToShowData ?? requiredIntegrations.length;
@@ -360,7 +363,7 @@ function AgentCard({
     return (
       <div
         className="bg-white rounded-3xl p-6 flex flex-col gap-5 cursor-pointer transition-shadow"
-        onClick={() => onOpenChat(name)}
+        onClick={() => !loading && (allConnected ? onOpenChat(name) : onConnect(name))}
         onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 4px 24px rgba(0,0,0,0.07)")}
         onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
       >
@@ -382,7 +385,7 @@ function AgentCard({
                 )}
                 <div
                   className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white"
-                  style={{ backgroundColor: allConnected ? color : "#F59E0B" }}
+                  style={{ backgroundColor: loading ? "#9CA3AF" : allConnected ? color : "#F59E0B" }}
                 />
             </div>
             <div>
@@ -391,14 +394,19 @@ function AgentCard({
             </div>
           </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: allConnected ? color : "#F59E0B" }} />
+          <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: loading ? "#9CA3AF" : allConnected ? color : "#F59E0B" }} />
           <span className="text-[11px] text-black font-medium" style={{ opacity: 0.5 }}>
-            {allConnected ? "Active" : "Setup needed"}
+            {loading ? "Loading…" : allConnected ? "Active" : "Setup needed"}
           </span>
         </div>
       </div>
 
-      {allConnected ? (
+      {loading ? (
+        <div className="flex-1 flex flex-col items-center justify-center py-8 gap-3">
+          <div className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: `${color}40`, borderTopColor: color }} />
+          <p className="text-[13px] text-black font-medium" style={{ opacity: 0.6 }}>Loading metrics…</p>
+        </div>
+      ) : allConnected ? (
         <>
           {/* Headline metric + sparkline */}
           <div className="flex items-end justify-between">
@@ -466,9 +474,11 @@ function AgentCard({
               </div>
               <p className="text-[13px] font-semibold text-black mb-1">Connect to activate {name}</p>
               <p className="text-[11px] text-black leading-relaxed mb-4" style={{ opacity: 0.45 }}>
-                {minIntegrationsToShowData && requiredIntegrations.length === 0
-                  ? `Connect at least one source to see data`
-                  : `${requiredIntegrations.map((i) => i.name).join(" and ")} required to start`}
+                {name === "ads"
+                  ? "Connect Google Ads, Meta Ads, or TikTok Ads to see performance"
+                  : minIntegrationsToShowData && requiredIntegrations.length === 0
+                    ? `Connect at least one source to see data`
+                    : `${requiredIntegrations.map((i) => i.name).join(" and ")} required to start`}
               </p>
               {/* Integration logos: show required, or first 3 when "at least one" */}
               <div className="flex items-center justify-center gap-2 mb-4">
@@ -512,23 +522,27 @@ const perfData = [
   { day: "Feb 28", visitors: 445, reviews: 10, leads: 20 },
 ];
 
-/* ─── Activity feed ─── */
+/* ─── Activity feed (from API) ─── */
 const agentColors: Record<string, string> = {
   seo: "#0088FF",
   reviews: "#1d1d1f",
   ads: "#111827",
 };
 
-const activityFeed = [
-  { agent: "seo",     time: "2 min ago",  text: 'Published "5 Reasons to Choose a Local Plumber" — targeting high-intent buyer keywords. Conversion CTA included.' },
-  { agent: "seo",     time: "18 min ago", text: "Sent 28 high-intent keywords → Ads Agent for campaign targeting. Expected ROAS uplift +18%." },
-  { agent: "reviews", time: "22 min ago", text: "Sent praise themes 'fast service' (82x) + 'friendly staff' (64x) → Ads Agent as 3 creative angles." },
-  { agent: "ads",     time: "1 hr ago",   text: "Built 3 new ad creatives using real review language from Reviews Agent. A/B test live. Early CTR +31%." },
-  { agent: "reviews", time: "2 hr ago",   text: "Flagged 'wait time' recurring complaint (8x) → SEO Agent for landing page improvement + Ads Agent for audience filter." },
-  { agent: "ads",     time: "3 hr ago",   text: "Loaded 28 SEO keywords into Google Search — 6 ad groups created. Current ROAS: 6.8x. Scaling +20%." },
-  { agent: "seo",     time: "Yesterday",  text: "Sent top 5 customer objections from search data → Reviews Agent for response tone calibration." },
-  { agent: "reviews", time: "Yesterday",  text: "Star rating 4.7 → 4.8. Trust rising. Close rate increasing. CAC dropping. Growth System is working." },
-];
+function formatActivityTime(isoDate: string): string {
+  const date = new Date(isoDate);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins} min ago`;
+  if (diffHours < 24) return `${diffHours} hr ago`;
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+  return date.toLocaleDateString();
+}
 
 type ReviewsOverview = {
   star_rating: number;
@@ -554,6 +568,22 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
   } | null>(null);
   const [reviewsGbpConnected, setReviewsGbpConnected] = useState<boolean>(false);
   const [reviewsOverview, setReviewsOverview] = useState<ReviewsOverview>(null);
+  const [adsGoogleConnected, setAdsGoogleConnected] = useState<boolean>(false);
+  const [adsMetaConnected, setAdsMetaConnected] = useState<boolean>(false);
+  const [adsTiktokConnected, setAdsTiktokConnected] = useState<boolean>(false);
+  const [seoLoading, setSeoLoading] = useState(true);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [adsLoading, setAdsLoading] = useState(true);
+  const [adsMetrics, setAdsMetrics] = useState<{
+    new_customers_this_month: number;
+    new_customers_previous_month: number;
+    avg_roas: number;
+    google_search_roas: number;
+    cost_per_customer: number;
+    cost_per_customer_previous: number;
+    active_campaigns_count: number;
+  } | null>(null);
+  const [activityFeed, setActivityFeed] = useState<{ id: number; agent: string; description: string; account_name: string; created_at: string }[]>([]);
 
   const firstName = profile?.full_name?.split(" ")[0] ?? null;
   const bizName = profile?.business_name ?? null;
@@ -581,6 +611,8 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
         }
       } catch {
         // Ignore errors; leave default false.
+      } finally {
+        setSeoLoading(false);
       }
     };
     loadSeoGscStatus();
@@ -612,13 +644,98 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
         }
       } catch {
         // Ignore errors.
+      } finally {
+        setReviewsLoading(false);
       }
     };
     loadReviews();
   }, []);
 
+  useEffect(() => {
+    const loadAdditionalAdsStatus = async () => {
+      try {
+        const [metaRes, tiktokRes] = await Promise.all([
+          fetch("/api/integrations/meta-ads/status"),
+          fetch("/api/integrations/tiktok-ads/status"),
+        ]);
+
+        if (metaRes.ok) {
+          const metaData = await metaRes.json();
+          if (typeof metaData.connected === "boolean") {
+            setAdsMetaConnected(metaData.connected);
+          }
+        }
+
+        if (tiktokRes.ok) {
+          const tiktokData = await tiktokRes.json();
+          if (typeof tiktokData.connected === "boolean") {
+            setAdsTiktokConnected(tiktokData.connected);
+          }
+        }
+      } catch {
+        // Ignore errors; additional ad platforms are optional.
+      }
+    };
+
+    loadAdditionalAdsStatus();
+  }, []);
+
+  useEffect(() => {
+    const loadAdsStatus = async () => {
+      try {
+        const res = await fetch("/api/integrations/google-ads/status");
+        if (!res.ok) return;
+        const data = await res.json();
+        const isConnected = typeof data.connected === "boolean" && data.connected;
+        setAdsGoogleConnected(isConnected);
+        if (isConnected) {
+          const metricsRes = await fetch("/api/integrations/google-ads/metrics");
+          if (metricsRes.ok) {
+            const m = await metricsRes.json();
+            setAdsMetrics({
+              new_customers_this_month: m.new_customers_this_month ?? 0,
+              new_customers_previous_month: m.new_customers_previous_month ?? 0,
+              avg_roas: m.avg_roas ?? 0,
+              google_search_roas: m.google_search_roas ?? 0,
+              cost_per_customer: m.cost_per_customer ?? 0,
+              cost_per_customer_previous: m.cost_per_customer_previous ?? 0,
+              active_campaigns_count: m.active_campaigns_count ?? 0,
+            });
+          }
+        } else {
+          setAdsMetrics(null);
+        }
+      } catch {
+        setAdsMetrics(null);
+      } finally {
+        setAdsLoading(false);
+      }
+    };
+    loadAdsStatus();
+  }, []);
+
+  useEffect(() => {
+    const loadActivityFeed = async () => {
+      try {
+        const res = await fetch("/api/activity");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (Array.isArray(data.activities)) {
+          setActivityFeed(data.activities);
+        }
+      } catch {
+        // leave empty
+      }
+    };
+    loadActivityFeed();
+  }, []);
+
   const reviewsConnectedCount = reviewsGbpConnected ? 1 : 0;
   const reviewsHasData = reviewsConnectedCount >= 1 && reviewsOverview !== null;
+  const adsConnectedCount =
+    (adsGoogleConnected ? 1 : 0) +
+    (adsMetaConnected ? 1 : 0) +
+    (adsTiktokConnected ? 1 : 0);
 
   return (
     <div className="flex-1 px-5 pt-3 pb-8 md:p-8 space-y-6" style={{ backgroundColor: "#f5f5f7" }}>
@@ -675,6 +792,7 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
             onOpenChat={onOpenChat}
             connectedCount={seoGscConnected ? 1 : 0}
             totalCount={4}
+            loading={seoLoading}
             activeTasks={[
               "Writing conversion post: \"Top 5 Signs You Need a Plumber\"",
               "Sending 28 keyword insights → Ads agent",
@@ -722,6 +840,7 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
           connectedCount={reviewsConnectedCount}
           totalCount={4}
           minIntegrationsToShowData={1}
+          loading={reviewsLoading}
           activeTasks={[
             "Drafting reply to 2-star review from John D.",
             "Sending praise themes 'fast service' → Ads agent",
@@ -732,20 +851,38 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
           role="Demand Generation Operator — owns profitable customer acquisition"
           initial="a"
           headlineLabel="Cost Per New Customer"
-          headlineValue="$4.20"
+          headlineValue={adsMetrics ? `$${adsMetrics.cost_per_customer.toFixed(2)}` : "—"}
           stats={[
-            { label: "Active campaigns", value: "3" },
-            { label: "Avg ROAS", value: "4.8x" },
-            { label: "New customers", value: "28" },
+            { label: "New customers", value: adsMetrics ? String(adsMetrics.new_customers_this_month) : "—" },
+            { label: "Avg ROAS", value: adsMetrics ? `${adsMetrics.avg_roas}x` : "—" },
+            { label: "Google Search ROAS", value: adsMetrics ? `${adsMetrics.google_search_roas}x` : "—" },
           ]}
-          sparkData={[8.5, 7.2, 6.8, 6.1, 5.5, 4.8, 4.2]}
-          status={_industry ? `Scaling ${_industry} campaigns — 6.8x ROAS on Google Search` : "Scaling campaigns — 6.8x ROAS on Google Search"}
+          sparkData={
+            adsMetrics && adsMetrics.cost_per_customer_previous > 0
+              ? (() => {
+                  const prev = adsMetrics.cost_per_customer_previous;
+                  const curr = adsMetrics.cost_per_customer;
+                  return [prev, prev * 0.95 + curr * 0.05, prev * 0.8 + curr * 0.2, prev * 0.5 + curr * 0.5, prev * 0.2 + curr * 0.8, curr * 0.95 + prev * 0.05, curr];
+                })()
+              : adsMetrics && adsMetrics.cost_per_customer > 0
+                ? [adsMetrics.cost_per_customer, adsMetrics.cost_per_customer, adsMetrics.cost_per_customer, adsMetrics.cost_per_customer, adsMetrics.cost_per_customer, adsMetrics.cost_per_customer, adsMetrics.cost_per_customer]
+                : [0, 0, 0, 0, 0, 0, 0]
+          }
+          status={
+            adsMetrics
+              ? `${adsMetrics.new_customers_this_month} new customers this month · ${adsMetrics.avg_roas}x ROAS · Google Search ${adsMetrics.google_search_roas}x`
+              : _industry
+                ? `Connect Google Ads, Meta Ads, or TikTok Ads to see ${_industry} campaign performance`
+                : "Connect Google Ads, Meta Ads, or TikTok Ads to see campaign performance"
+          }
           color="#111827"
           lightColor="#F3F4F6"
           onConnect={onConnect}
           onOpenChat={onOpenChat}
-          connectedCount={2}
+          connectedCount={adsConnectedCount}
           totalCount={4}
+          minIntegrationsToShowData={1}
+          loading={adsLoading}
           activeTasks={[
             "A/B testing creatives built from review language",
             "Loading 28 SEO keywords → Google Search campaigns",
@@ -801,28 +938,32 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
         </ResponsiveContainer>
       </div>
 
-      {/* ── Recent Activity Feed ── */}
+      {/* ── Recent Activity Feed (from API) ── */}
       <div className="bg-white rounded-3xl p-6 md:p-8">
         <h2 className="text-[18px] font-semibold text-black tracking-[-0.02em] mb-6">What your agents did today</h2>
         <div className="space-y-1">
-          {activityFeed.map((item, i) => (
-            <div
-              key={i}
-              className="flex items-start gap-3.5 py-3 rounded-xl px-3 -mx-3 transition-colors"
-              style={{ cursor: "default" }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f5f5f7")}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-            >
-              <div className="w-2 h-2 rounded-full mt-[6px] shrink-0" style={{ backgroundColor: agentColors[item.agent] || "#1d1d1f" }} />
-              <div className="flex-1 min-w-0">
+          {activityFeed.length === 0 ? (
+            <p className="text-[13px] text-black py-4" style={{ opacity: 0.5 }}>No agent activity recorded yet. Activity is logged when agents complete tasks.</p>
+          ) : (
+            activityFeed.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-start gap-3.5 py-3 rounded-xl px-3 -mx-3 transition-colors"
+                style={{ cursor: "default" }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f5f5f7")}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+              >
+                <div className="w-2 h-2 rounded-full mt-[6px] shrink-0" style={{ backgroundColor: agentColors[item.agent] || "#1d1d1f" }} />
+                <div className="flex-1 min-w-0">
                   <p className="text-[13px] text-black leading-relaxed">
                     <span className="font-semibold">{agentDisplayNames[item.agent] ?? item.agent}</span>
-                    {" "}{item.text}
+                    {" "}{item.description}
                   </p>
+                </div>
+                <span className="text-[11px] text-black shrink-0 mt-0.5 whitespace-nowrap" style={{ opacity: 0.4 }}>{formatActivityTime(item.created_at)}</span>
               </div>
-              <span className="text-[11px] text-black shrink-0 mt-0.5 whitespace-nowrap" style={{ opacity: 0.4 }}>{item.time}</span>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -962,8 +1103,9 @@ const initialConnected: Record<string, boolean> = {
   "reviews-Yelp": false,
   "reviews-Facebook": false,
   "reviews-Trustpilot": false,
-  "ads-Google Ads": true,
-  "ads-Meta Ads": true,
+  // Ads Agent: default to not connected; real status comes from backend.
+  "ads-Google Ads": false,
+  "ads-Meta Ads": false,
   "ads-Google Analytics": false,
   "ads-TikTok Ads": false,
 };
@@ -999,6 +1141,7 @@ function IntegrationsView({ focusAgent }: { focusAgent?: string }) {
           setConnected((prev) => ({
             ...prev,
             "seo-Google Ads": data.connected,
+            "ads-Google Ads": data.connected,
           }));
         }
       } catch {
@@ -1022,9 +1165,43 @@ function IntegrationsView({ focusAgent }: { focusAgent?: string }) {
       }
     };
 
+    const loadMetaAdsStatus = async () => {
+      try {
+        const res = await fetch("/api/integrations/meta-ads/status");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (typeof data.connected === "boolean") {
+          setConnected((prev) => ({
+            ...prev,
+            "ads-Meta Ads": data.connected,
+          }));
+        }
+      } catch {
+        // Ignore errors; leave default state.
+      }
+    };
+
+    const loadTiktokAdsStatus = async () => {
+      try {
+        const res = await fetch("/api/integrations/tiktok-ads/status");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (typeof data.connected === "boolean") {
+          setConnected((prev) => ({
+            ...prev,
+            "ads-TikTok Ads": data.connected,
+          }));
+        }
+      } catch {
+        // Ignore errors; leave default state.
+      }
+    };
+
     loadGscStatus();
     loadAdsStatus();
     loadGbpStatus();
+    loadMetaAdsStatus();
+    loadTiktokAdsStatus();
   }, []);
 
   const toggle = (agent: string, name: string) => {
@@ -1068,6 +1245,26 @@ function IntegrationsView({ focusAgent }: { focusAgent?: string }) {
         process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
       const next = `${window.location.origin}/app?tab=integrations`;
       window.location.href = `${backendBase}/integrations/google-business-profile/start/?next=${encodeURIComponent(
+        next,
+      )}`;
+      return;
+    }
+    // Meta Ads: start OAuth flow via backend (status is from API; no simulated toggle)
+    if (key === "ads-Meta Ads") {
+      const backendBase =
+        process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
+      const next = `${window.location.origin}/app?tab=integrations`;
+      window.location.href = `${backendBase}/integrations/meta-ads/start/?next=${encodeURIComponent(
+        next,
+      )}`;
+      return;
+    }
+    // TikTok Ads: start OAuth flow via backend (status is from API; no simulated toggle)
+    if (key === "ads-TikTok Ads") {
+      const backendBase =
+        process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
+      const next = `${window.location.origin}/app?tab=integrations`;
+      window.location.href = `${backendBase}/integrations/tiktok-ads/start/?next=${encodeURIComponent(
         next,
       )}`;
       return;
@@ -1460,6 +1657,7 @@ function SEOAgentOverview({
   detail,
   onChat,
   metrics,
+  metricsLoading = false,
 }: {
   cfg: typeof agentConfig["seo"];
   detail: typeof agentDetailData["seo"];
@@ -1470,6 +1668,7 @@ function SEOAgentOverview({
     top3_positions: number;
     organic_growth_pct: number;
   } | null;
+  metricsLoading?: boolean;
 }) {
   const [keywordData, setKeywordData] = useState<{
     keyword: string;
@@ -1480,17 +1679,19 @@ function SEOAgentOverview({
     impressions: number;
     clicks: number;
   }[]>([]);
+  const [keywordsLoading, setKeywordsLoading] = useState(true);
 
   useEffect(() => {
     const loadKeywords = async () => {
+      setKeywordsLoading(true);
       try {
         const res = await fetch("/api/seo/keywords");
         if (!res.ok) return;
         const data = await res.json();
         if (Array.isArray(data.keywords)) {
           setKeywordData(
-            data.keywords.map((k: any) => ({
-              keyword: k.keyword,
+            data.keywords.map((k: { keyword?: string; avg_monthly_searches?: number; intent?: string; current_position?: number; position_change?: number; impressions?: number; clicks?: number }) => ({
+              keyword: k.keyword ?? "",
               avg_monthly_searches: k.avg_monthly_searches ?? null,
               intent: k.intent ?? "MEDIUM",
               position: k.current_position ?? 0,
@@ -1502,6 +1703,8 @@ function SEOAgentOverview({
         }
       } catch {
         // leave keywordData empty on error
+      } finally {
+        setKeywordsLoading(false);
       }
     };
     loadKeywords();
@@ -1531,53 +1734,66 @@ function SEOAgentOverview({
 
       {/* Stats Row (GSC-powered) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Organic Visitors This Month */}
-        <div className="bg-white rounded-3xl p-6 flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-black" style={{ opacity: 0.4 }}><Eye size={13} /></span>
-            <p className="text-[11px] font-medium text-black uppercase tracking-wide" style={{ opacity: 0.4 }}>
-              Organic Visitors This Month
-            </p>
-          </div>
-          <p className="text-[36px] font-semibold tracking-[-0.04em] leading-none text-black">
-            {metrics ? metrics.organic_visitors.toLocaleString() : "—"}
-          </p>
-          <p className="text-[12px] text-black" style={{ opacity: 0.4 }}>
-            {metrics
-              ? `${metrics.organic_growth_pct >= 0 ? "+" : ""}${metrics.organic_growth_pct.toFixed(0)}% this month`
-              : ""}
-          </p>
-        </div>
+        {metricsLoading ? (
+          <>
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white rounded-3xl p-6 flex flex-col items-center justify-center gap-3 min-h-[140px]">
+                <div className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#0088FF40", borderTopColor: "#0088FF" }} />
+                <p className="text-[13px] text-black font-medium" style={{ opacity: 0.6 }}>Loading metrics…</p>
+              </div>
+            ))}
+          </>
+        ) : (
+          <>
+            {/* Organic Visitors This Month */}
+            <div className="bg-white rounded-3xl p-6 flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-black" style={{ opacity: 0.4 }}><Eye size={13} /></span>
+                <p className="text-[11px] font-medium text-black uppercase tracking-wide" style={{ opacity: 0.4 }}>
+                  Organic Visitors This Month
+                </p>
+              </div>
+              <p className="text-[36px] font-semibold tracking-[-0.04em] leading-none text-black">
+                {metrics ? metrics.organic_visitors.toLocaleString() : "—"}
+              </p>
+              <p className="text-[12px] text-black" style={{ opacity: 0.4 }}>
+                {metrics
+                  ? `${metrics.organic_growth_pct >= 0 ? "+" : ""}${metrics.organic_growth_pct.toFixed(0)}% this month`
+                  : ""}
+              </p>
+            </div>
 
-        {/* Keywords ranking */}
-        <div className="bg-white rounded-3xl p-6 flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-black" style={{ opacity: 0.4 }}><TrendingUp size={13} /></span>
-            <p className="text-[11px] font-medium text-black uppercase tracking-wide" style={{ opacity: 0.4 }}>
-              Keywords ranking
-            </p>
-          </div>
-          <p className="text-[36px] font-semibold tracking-[-0.04em] leading-none text-black">
-            {metrics ? metrics.keywords_ranking.toLocaleString() : "—"}
-          </p>
-          <p className="text-[12px] text-black" style={{ opacity: 0.4 }}>
-            {metrics ? `${metrics.top3_positions.toLocaleString()} in top 3 positions` : ""}
-          </p>
-        </div>
+            {/* Keywords ranking */}
+            <div className="bg-white rounded-3xl p-6 flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-black" style={{ opacity: 0.4 }}><TrendingUp size={13} /></span>
+                <p className="text-[11px] font-medium text-black uppercase tracking-wide" style={{ opacity: 0.4 }}>
+                  Keywords ranking
+                </p>
+              </div>
+              <p className="text-[36px] font-semibold tracking-[-0.04em] leading-none text-black">
+                {metrics ? metrics.keywords_ranking.toLocaleString() : "—"}
+              </p>
+              <p className="text-[12px] text-black" style={{ opacity: 0.4 }}>
+                {metrics ? `${metrics.top3_positions.toLocaleString()} in top 3 positions` : ""}
+              </p>
+            </div>
 
-        {/* Top 3 positions */}
-        <div className="bg-white rounded-3xl p-6 flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-black" style={{ opacity: 0.4 }}><BarChart3 size={13} /></span>
-            <p className="text-[11px] font-medium text-black uppercase tracking-wide" style={{ opacity: 0.4 }}>
-              Top 3 positions
-            </p>
-          </div>
-          <p className="text-[36px] font-semibold tracking-[-0.04em] leading-none text-black">
-            {metrics ? metrics.top3_positions.toLocaleString() : "—"}
-          </p>
-          <p className="text-[12px] text-black" style={{ opacity: 0.0 }}>&nbsp;</p>
-        </div>
+            {/* Top 3 positions */}
+            <div className="bg-white rounded-3xl p-6 flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-black" style={{ opacity: 0.4 }}><BarChart3 size={13} /></span>
+                <p className="text-[11px] font-medium text-black uppercase tracking-wide" style={{ opacity: 0.4 }}>
+                  Top 3 positions
+                </p>
+              </div>
+              <p className="text-[36px] font-semibold tracking-[-0.04em] leading-none text-black">
+                {metrics ? metrics.top3_positions.toLocaleString() : "—"}
+              </p>
+              <p className="text-[12px] text-black" style={{ opacity: 0.0 }}>&nbsp;</p>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Keyword Rankings + Content Pipeline */}
@@ -1600,7 +1816,13 @@ function SEOAgentOverview({
             </div>
           </div>
           <div className="divide-y" style={{ borderColor: "#f5f5f7" }}>
-            {keywordData.map((kw, i) => (
+            {keywordsLoading ? (
+              <div className="flex flex-col items-center justify-center py-12 gap-3">
+                <div className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#0088FF40", borderTopColor: "#0088FF" }} />
+                <p className="text-[13px] text-black font-medium" style={{ opacity: 0.6 }}>Loading keywords…</p>
+              </div>
+            ) : (
+            keywordData.map((kw, i) => (
               <div
                 key={i}
                 className="grid grid-cols-2 md:grid-cols-5 gap-3 px-6 py-3.5 items-center text-[12px] transition-colors"
@@ -1648,7 +1870,8 @@ function SEOAgentOverview({
                         : "—"}
                 </div>
               </div>
-            ))}
+            ))
+            )}
           </div>
         </div>
 
@@ -1796,23 +2019,48 @@ function SEOAgentOverview({
 function AdsAgentOverview({
   cfg,
   detail,
+  metrics,
+  metricsLoading,
   onChat,
 }: {
   cfg: typeof agentConfig["ads"];
   detail: typeof agentDetailData["ads"];
+  metrics?: {
+    new_customers_this_month: number;
+    new_customers_previous_month: number;
+    avg_roas: number;
+    google_search_roas: number;
+    cost_per_customer: number;
+    cost_per_customer_previous: number;
+    active_campaigns_count: number;
+  } | null;
+  metricsLoading?: boolean;
   onChat: (msg: string) => void;
 }) {
-  const campaigns = [
-    { name: "Google Search — Local Intent", platform: "Google Ads", roas: "6.8x", spend: "$1,400", cpa: "$3.80", status: "scaling" },
-    { name: "Meta Retargeting — Warm Audience", platform: "Meta Ads", roas: "4.1x", spend: "$900", cpa: "$4.50", status: "stable" },
-    { name: "TikTok — New Creative Test", platform: "TikTok Ads", roas: "2.9x", spend: "$540", cpa: "$6.20", status: "testing" },
-  ];
+  const stats = (() => {
+    if (!metrics) return detail.stats;
+    const diff = metrics.new_customers_this_month - metrics.new_customers_previous_month;
+    const customersSub = diff > 0
+      ? `+${diff} vs last month`
+      : diff < 0
+        ? `${diff} vs last month`
+        : "Same as last month";
+    const costSub = metrics.cost_per_customer_previous > 0
+      ? (metrics.cost_per_customer < metrics.cost_per_customer_previous
+          ? `Down from $${metrics.cost_per_customer_previous.toFixed(2)}`
+          : metrics.cost_per_customer > metrics.cost_per_customer_previous
+            ? `Up from $${metrics.cost_per_customer_previous.toFixed(2)}`
+            : "Same as last month")
+      : metrics.new_customers_this_month > 0 ? "From Google Ads" : "—";
+    return [
+      { label: "New Customers/mo", value: String(metrics.new_customers_this_month), sub: customersSub, icon: Zap },
+      { label: "Avg ROAS", value: `${metrics.avg_roas}x`, sub: `Google Search: ${metrics.google_search_roas}x`, icon: TrendingUp },
+      { label: "Cost Per Customer", value: `$${metrics.cost_per_customer.toFixed(2)}`, sub: costSub, icon: DollarSign },
+    ];
+  })();
 
-  const creativeAngles = [
-    { angle: "Same-day service, guaranteed", source: "Reviews agent", hook: "Fast service (82x mentions)", status: "live" },
-    { angle: "People who care about your home", source: "Reviews agent", hook: "Friendly team (64x mentions)", status: "testing" },
-    { angle: "Quality at honest prices", source: "Reviews agent", hook: "Great value (41x mentions)", status: "queued" },
-  ];
+  const activeCount = metrics?.active_campaigns_count ?? 0;
+  const hasNoActiveCampaigns = metrics !== undefined && metrics !== null && activeCount === 0;
 
   const statusColor = (s: string) => s === "scaling" ? "#22C55E" : s === "stable" ? "#0088FF" : s === "testing" ? "#F59E0B" : "#9CA3AF";
   const statusBg = (s: string) => s === "scaling" ? "#F0FDF4" : s === "stable" ? "#EFF6FF" : s === "testing" ? "#FFFBEB" : "#F9FAFB";
@@ -1820,98 +2068,64 @@ function AdsAgentOverview({
   return (
     <div className="space-y-4">
 
-      {/* Stats Row */}
+      {/* Stats Row — real data from Google Ads (0 when that's the real number) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {detail.stats.map((s) => (
-          <div key={s.label} className="bg-white rounded-3xl p-6 flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-black" style={{ opacity: 0.4 }}><s.icon size={13} /></span>
-              <p className="text-[11px] font-medium text-black uppercase tracking-wide" style={{ opacity: 0.4 }}>{s.label}</p>
+        {metricsLoading ? (
+          <>
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white rounded-3xl p-6 flex flex-col items-center justify-center gap-3 min-h-[140px]">
+                <div className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#11182740", borderTopColor: "#111827" }} />
+                <p className="text-[13px] text-black font-medium" style={{ opacity: 0.6 }}>Loading metrics…</p>
+              </div>
+            ))}
+          </>
+        ) : (
+          stats.map((s) => (
+            <div key={s.label} className="bg-white rounded-3xl p-6 flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-black" style={{ opacity: 0.4 }}><s.icon size={13} /></span>
+                <p className="text-[11px] font-medium text-black uppercase tracking-wide" style={{ opacity: 0.4 }}>{s.label}</p>
+              </div>
+              <p className="text-[36px] font-semibold tracking-[-0.04em] leading-none text-black">{s.value}</p>
+              <p className="text-[12px] text-black" style={{ opacity: 0.4 }}>{s.sub}</p>
             </div>
-            <p className="text-[36px] font-semibold tracking-[-0.04em] leading-none text-black">{s.value}</p>
-            <p className="text-[12px] text-black" style={{ opacity: 0.4 }}>{s.sub}</p>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
-      {/* Campaign Performance + Creative Production */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-        {/* Campaign Leaderboard */}
-        <div className="bg-white rounded-3xl overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: "1px solid #f5f5f7" }}>
-            <div>
-              <h3 className="text-[15px] font-semibold text-black">Campaign Performance</h3>
-              <p className="text-[12px] text-black mt-0.5" style={{ opacity: 0.4 }}>Profit over traffic. ROAS over vanity metrics.</p>
-            </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ backgroundColor: "#F3F4F6" }}>
-              <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: "#111827" }} />
-              <span className="text-[11px] font-medium text-black" style={{ opacity: 0.6 }}>3 Active</span>
-            </div>
+      {/* Campaign Performance — live active count; no-campaigns message when 0 */}
+      <div className="bg-white rounded-3xl overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: "1px solid #f5f5f7" }}>
+          <div>
+            <h3 className="text-[15px] font-semibold text-black">Campaign Performance</h3>
+            <p className="text-[12px] text-black mt-0.5" style={{ opacity: 0.4 }}>Profit over traffic. ROAS over vanity metrics.</p>
           </div>
-          <div className="divide-y" style={{ borderColor: "#f5f5f7" }}>
-            {campaigns.map((c, i) => (
-              <div key={i} className="px-6 py-4 transition-colors"
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#F9F9F9")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <p className="text-[13px] font-semibold text-black truncate">{c.name}</p>
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize shrink-0"
-                      style={{ backgroundColor: statusBg(c.status), color: statusColor(c.status) }}>
-                      {c.status}
-                    </span>
-                  </div>
-                  <p className="text-[15px] font-bold shrink-0 ml-2" style={{ color: "#111827" }}>{c.roas}</p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-[11px] text-black" style={{ opacity: 0.4 }}>Spend: {c.spend}/mo</span>
-                  <span className="text-[11px] text-black" style={{ opacity: 0.4 }}>CPA: {c.cpa}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="px-6 py-4" style={{ borderTop: "1px solid #f5f5f7" }}>
-            <button onClick={() => onChat("Diagnose my campaign performance")}
-              className="text-[13px] font-semibold" style={{ color: "#111827" }}>
-              Full performance diagnosis →
-            </button>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ backgroundColor: "#F3F4F6" }}>
+            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: "#111827" }} />
+            <span className="text-[11px] font-medium text-black" style={{ opacity: 0.6 }}>
+              {metricsLoading ? "…" : (metrics != null ? `${activeCount} Active` : "—")}
+            </span>
           </div>
         </div>
-
-        {/* Creative Production from Reviews */}
-        <div className="bg-white rounded-3xl overflow-hidden">
-          <div className="px-6 py-5" style={{ borderBottom: "1px solid #f5f5f7" }}>
-            <h3 className="text-[15px] font-semibold text-black">Creative Production</h3>
-            <p className="text-[12px] text-black mt-0.5" style={{ opacity: 0.4 }}>Built from real review language — highest conversion probability</p>
+        {metricsLoading ? (
+          <div className="flex flex-col items-center justify-center py-12 gap-3">
+            <div className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#11182740", borderTopColor: "#111827" }} />
+            <p className="text-[13px] text-black font-medium" style={{ opacity: 0.6 }}>Loading metrics…</p>
           </div>
-          <div className="divide-y" style={{ borderColor: "#f5f5f7" }}>
-            {creativeAngles.map((c, i) => (
-              <div key={i} className="px-6 py-4 transition-colors"
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#F9F9F9")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-semibold text-black">&ldquo;{c.angle}&rdquo;</p>
-                    <p className="text-[11px] text-black mt-0.5" style={{ opacity: 0.45 }}>Source: {c.hook}</p>
-                  </div>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize shrink-0 mt-0.5"
-                    style={{ backgroundColor: statusBg(c.status), color: statusColor(c.status) }}>
-                    {c.status}
-                  </span>
-                </div>
-              </div>
-            ))}
+        ) : hasNoActiveCampaigns ? (
+          <div className="px-6 py-8 text-center">
+            <p className="text-[14px] text-black" style={{ opacity: 0.6 }}>There are no active campaigns.</p>
           </div>
-          <div className="px-6 py-4" style={{ borderTop: "1px solid #f5f5f7" }}>
-            <button onClick={() => onChat("Generate new ad creatives using review language")}
-              className="text-[13px] font-semibold" style={{ color: "#111827" }}>
-              Generate more creative angles →
-            </button>
-          </div>
-        </div>
+        ) : (
+          <>
+            <div className="px-6 py-4" style={{ borderTop: "1px solid #f5f5f7" }}>
+              <button onClick={() => onChat("Diagnose my campaign performance")}
+                className="text-[13px] font-semibold" style={{ color: "#111827" }}>
+                Full performance diagnosis →
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Budget Intelligence */}
@@ -2035,20 +2249,27 @@ function ReviewsAgentOverview({
   cfg,
   detail,
   onChat,
+  refreshTrigger = 0,
+  onDataLoaded,
 }: {
   cfg: typeof agentConfig["reviews"];
   detail: typeof agentDetailData["reviews"];
   onChat: (msg: string) => void;
+  refreshTrigger?: number;
+  onDataLoaded?: () => void;
 }) {
   const [showDraftModal, setShowDraftModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
   const [requestTone, setRequestTone] = useState<"friendly" | "professional" | "luxury">("friendly");
   const [reviewsOverview, setReviewsOverview] = useState<ReviewsOverviewData>(null);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
+      setReviewsLoading(true);
       try {
-        const res = await fetch("/api/reviews/overview");
+        const url = refreshTrigger > 0 ? "/api/reviews/overview?refresh=1" : "/api/reviews/overview";
+        const res = await fetch(url);
         if (!res.ok) return;
         const data = await res.json();
         if (data && typeof data.star_rating === "number") {
@@ -2063,12 +2284,16 @@ function ReviewsAgentOverview({
             conversion_pct: data.conversion_pct ?? 0,
           });
         }
+        onDataLoaded?.();
       } catch {
         // leave null; use placeholders
+      } finally {
+        setReviewsLoading(false);
       }
     };
     load();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only refetch when refreshTrigger changes; onDataLoaded is stable for callback use
+  }, [refreshTrigger]);
 
   const recentReviews: { id: number; author: string; platform: string; stars: number; time: string; text: string; risk: string; tone: string; responded: boolean; response: string }[] = [];
 
@@ -2108,9 +2333,19 @@ function ReviewsAgentOverview({
   return (
     <div className="space-y-4">
 
-      {/* ── Part 1: Stats Row (actual data from API; placeholders only when no data loaded) ── */}
+      {/* ── Part 1: Stats Row (actual data from API; loading or placeholders) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        {(
+        {reviewsLoading ? (
+          <>
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-white rounded-3xl p-6 flex flex-col items-center justify-center gap-3 min-h-[120px]">
+                <div className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#1d1d1f40", borderTopColor: "#1d1d1f" }} />
+                <p className="text-[13px] text-black font-medium" style={{ opacity: 0.6 }}>Loading metrics…</p>
+              </div>
+            ))}
+          </>
+        ) : (
+        (
           [
             {
               label: "Star Rating",
@@ -2158,7 +2393,8 @@ function ReviewsAgentOverview({
             <p className="text-[36px] font-semibold tracking-[-0.04em] leading-none text-black">{s.value}</p>
             <p className="text-[12px] text-black" style={{ opacity: 0.4 }}>{s.sub}</p>
           </div>
-        ))}
+        ))
+        )}
       </div>
 
       {/* ── Part 2 & 3: Incoming Reviews + Sentiment ── */}
@@ -2501,9 +2737,11 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
   onBack: () => void;
   onGoIntegrations: (agent: string) => void;
 }) {
-  const searchParams = useSearchParams();
-  const initialTab = (searchParams.get("tab") as "overview" | "chat") || "overview";
-  const [tab, setTab] = useState<"overview" | "chat">(initialTab);
+  const [tab, setTab] = useState<"overview" | "chat">("overview");
+
+  useEffect(() => {
+    setTab("overview");
+  }, [agentName]);
   const [chats, setChats] = useState<ChatThread[]>([{ id: 0, title: "New conversation", messages: [] }]);
   const [activeChatId, setActiveChatId] = useState(0);
   const [input, setInput] = useState("");
@@ -2516,14 +2754,31 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
     top3_positions: number;
     organic_growth_pct: number;
   } | null>(null);
+  const [seoMetricsLoading, setSeoMetricsLoading] = useState(true);
+
+  const [adsMetrics, setAdsMetrics] = useState<{
+    new_customers_this_month: number;
+    new_customers_previous_month: number;
+    avg_roas: number;
+    google_search_roas: number;
+    cost_per_customer: number;
+    cost_per_customer_previous: number;
+    active_campaigns_count: number;
+  } | null>(null);
+
+  const [adsConnected, setAdsConnected] = useState<boolean | null>(null);
+  const [adsMetricsLoading, setAdsMetricsLoading] = useState(false);
+  const [agentDataLastUpdated, setAgentDataLastUpdated] = useState<Date | null>(null);
+  const [reviewsRefreshTrigger, setReviewsRefreshTrigger] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
 
   const cfg = agentConfig[agentName];
   const detail = agentDetailData[agentName];
 
   useEffect(() => {
-    // Load SEO metrics for the SEO agent overview tab
     const loadSeoMetrics = async () => {
       if (agentName !== "seo") return;
+      setSeoMetricsLoading(true);
       try {
         const res = await fetch("/api/seo/overview");
         if (!res.ok) return;
@@ -2534,12 +2789,80 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
           top3_positions: m.top3_positions ?? 0,
           organic_growth_pct: m.organic_growth_pct ?? 0,
         });
+        setAgentDataLastUpdated(new Date());
       } catch {
         // leave metrics null on error
+      } finally {
+        setSeoMetricsLoading(false);
       }
     };
     loadSeoMetrics();
   }, [agentName]);
+
+  useEffect(() => {
+    const loadAdsMetrics = async () => {
+      if (agentName !== "ads") return;
+      setAdsMetricsLoading(true);
+      try {
+        const res = await fetch("/api/integrations/google-ads/metrics");
+        if (!res.ok) return;
+        const m = await res.json();
+        setAdsMetrics({
+          new_customers_this_month: m.new_customers_this_month ?? 0,
+          new_customers_previous_month: m.new_customers_previous_month ?? 0,
+          avg_roas: m.avg_roas ?? 0,
+          google_search_roas: m.google_search_roas ?? 0,
+          cost_per_customer: m.cost_per_customer ?? 0,
+          cost_per_customer_previous: m.cost_per_customer_previous ?? 0,
+          active_campaigns_count: m.active_campaigns_count ?? 0,
+        });
+        setAgentDataLastUpdated(new Date());
+      } catch {
+        setAdsMetrics(null);
+      } finally {
+        setAdsMetricsLoading(false);
+      }
+    };
+    loadAdsMetrics();
+  }, [agentName]);
+
+  useEffect(() => {
+    // Track real Ads platform connection status for Ads Agent (Google, Meta, or TikTok).
+    const loadAdsStatus = async () => {
+      if (agentName !== "ads") return;
+      try {
+        const [googleRes, metaRes, tiktokRes] = await Promise.all([
+          fetch("/api/integrations/google-ads/status"),
+          fetch("/api/integrations/meta-ads/status"),
+          fetch("/api/integrations/tiktok-ads/status"),
+        ]);
+
+        const parseBool = async (res: Response) => {
+          if (!res.ok) return false;
+          const data = await res.json();
+          return typeof data.connected === "boolean" ? data.connected : false;
+        };
+
+        const [googleConnected, metaConnected, tiktokConnected] = await Promise.all([
+          parseBool(googleRes),
+          parseBool(metaRes),
+          parseBool(tiktokRes),
+        ]);
+
+        setAdsConnected(googleConnected || metaConnected || tiktokConnected);
+      } catch {
+        setAdsConnected(false);
+      }
+    };
+    loadAdsStatus();
+  }, [agentName]);
+
+  // When on Ads agent and not connected, redirect to integrations (no connect box)
+  useEffect(() => {
+    if (agentName === "ads" && adsConnected === false) {
+      onGoIntegrations("ads");
+    }
+  }, [agentName, adsConnected, onGoIntegrations]);
 
   useEffect(() => {
     if (chats.length > 0 && activeChatId !== undefined) {
@@ -2549,7 +2872,62 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
 
   if (!cfg || !detail) return null;
 
-  const isLocked = cfg.requiredIntegrations.some((i) => !i.connected);
+  // Ads agent: never show connect box; we redirect when not connected. Show loading while checking.
+  if (agentName === "ads") {
+    if (adsConnected === null) {
+      return (
+        <div className="flex-1 flex items-center justify-center p-8" style={{ backgroundColor: "#f5f5f7" }}>
+          <div className="text-[14px] text-black" style={{ opacity: 0.5 }}>Loading...</div>
+        </div>
+      );
+    }
+    if (adsConnected === false) {
+      return null; // Redirect in progress
+    }
+  }
+
+  const isLocked =
+    agentName === "ads"
+      ? false // Ads: already handled above (redirect when not connected)
+      : cfg.requiredIntegrations.some((i) => !i.connected);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      if (agentName === "seo") {
+        const res = await fetch("/api/seo/overview?refresh=1");
+        if (res.ok) {
+          const m = await res.json();
+          setSeoMetrics({
+            organic_visitors: m.organic_visitors ?? 0,
+            keywords_ranking: m.keywords_ranking ?? 0,
+            top3_positions: m.top3_positions ?? 0,
+            organic_growth_pct: m.organic_growth_pct ?? 0,
+          });
+          setAgentDataLastUpdated(new Date());
+        }
+      } else if (agentName === "ads") {
+        const res = await fetch("/api/integrations/google-ads/metrics?refresh=1");
+        if (res.ok) {
+          const m = await res.json();
+          setAdsMetrics({
+            new_customers_this_month: m.new_customers_this_month ?? 0,
+            new_customers_previous_month: m.new_customers_previous_month ?? 0,
+            avg_roas: m.avg_roas ?? 0,
+            google_search_roas: m.google_search_roas ?? 0,
+            cost_per_customer: m.cost_per_customer ?? 0,
+            cost_per_customer_previous: m.cost_per_customer_previous ?? 0,
+            active_campaigns_count: m.active_campaigns_count ?? 0,
+          });
+          setAgentDataLastUpdated(new Date());
+        }
+      } else if (agentName === "reviews") {
+        setReviewsRefreshTrigger((t) => t + 1);
+      }
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const activeChat = chats.find((c) => c.id === activeChatId)!;
   const messages = activeChat?.messages ?? [];
@@ -2707,7 +3085,9 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
               </div>
               <h2 className="text-[20px] font-semibold text-black tracking-tight mb-2">Connect integrations to activate {agentDisplayNames[agentName] ?? agentName}</h2>
             <p className="text-[14px] leading-relaxed mb-6" style={{ color: "rgba(0,0,0,0.45)" }}>
-              {agentDisplayNames[agentName] ?? agentName} needs {cfg.requiredIntegrations.map((i) => i.name).join(" & ")} before it can start working for you.
+              {agentName === "ads"
+                ? "Ads Agent needs Google Ads connected before it can start working for you."
+                : `${agentDisplayNames[agentName] ?? agentName} needs ${cfg.requiredIntegrations.map((i) => i.name).join(" & ")} before it can start working for you.`}
             </p>
             <button
               onClick={() => onGoIntegrations(agentName)}
@@ -2766,20 +3146,41 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
           </div>
         </div>
 
-      {/* ── Tabs ── */}
-      <div className={`flex items-center gap-1 ${tab === 'chat' ? 'hidden' : 'flex'}`}>
-        {(["overview", "chat"] as const).map((t) => (
+      {/* ── Tabs + Refresh ── */}
+      <div className={`flex items-center justify-between gap-4 ${tab === 'chat' ? 'hidden' : 'flex'}`}>
+        <div className="flex items-center gap-1">
+          {(["overview", "chat"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className="px-4 py-2 rounded-full text-[13px] font-medium transition-colors capitalize"
+              style={tab === t
+                ? { backgroundColor: "#1d1d1f", color: "#ffffff" }
+                : { backgroundColor: "#ffffff", color: "#1d1d1f", opacity: 0.5 }}
+            >
+              {t === "overview" ? "Overview" : "Chat"}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-3">
+          {agentDataLastUpdated && (
+            <span className="text-[12px] text-black whitespace-nowrap" style={{ opacity: 0.5 }}>
+              Last updated {agentDataLastUpdated.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false })}
+            </span>
+          )}
           <button
-            key={t}
-            onClick={() => setTab(t)}
-            className="px-4 py-2 rounded-full text-[13px] font-medium transition-colors capitalize"
-            style={tab === t
-              ? { backgroundColor: "#1d1d1f", color: "#ffffff" }
-              : { backgroundColor: "#ffffff", color: "#1d1d1f", opacity: 0.5 }}
+            type="button"
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] font-medium transition-colors"
+            style={{ backgroundColor: "#f5f5f7", color: "#1d1d1f" }}
+            onMouseEnter={(e) => !refreshing && (e.currentTarget.style.backgroundColor = "#ebebeb")}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#f5f5f7")}
           >
-            {t === "overview" ? "Overview" : "Chat"}
+            <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
+            Refresh
           </button>
-        ))}
+        </div>
       </div>
 
       {/* ── OVERVIEW TAB ── */}
@@ -2788,15 +3189,22 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
           cfg={cfg}
           detail={detail}
           metrics={seoMetrics}
+          metricsLoading={seoMetricsLoading}
           onChat={(msg) => {
             setTab("chat");
             setTimeout(() => send(msg), 50);
           }}
         />
       ) : tab === "overview" && agentName === "ads" ? (
-        <AdsAgentOverview cfg={cfg as typeof agentConfig["ads"]} detail={detail} onChat={(msg) => { setTab("chat"); setTimeout(() => send(msg), 50); }} />
+        <AdsAgentOverview cfg={cfg as typeof agentConfig["ads"]} detail={detail} metrics={adsMetrics} metricsLoading={adsMetricsLoading} onChat={(msg) => { setTab("chat"); setTimeout(() => send(msg), 50); }} />
       ) : tab === "overview" && agentName === "reviews" ? (
-        <ReviewsAgentOverview cfg={cfg} detail={detail} onChat={(msg) => { setTab("chat"); setTimeout(() => send(msg), 50); }} />
+        <ReviewsAgentOverview
+          cfg={cfg}
+          detail={detail}
+          onChat={(msg) => { setTab("chat"); setTimeout(() => send(msg), 50); }}
+          refreshTrigger={reviewsRefreshTrigger}
+          onDataLoaded={() => setAgentDataLastUpdated(new Date())}
+        />
       ) : tab === "overview" && (
         <>
           {/* Stat cards */}
@@ -3783,6 +4191,24 @@ function AppContent() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
   const [readNotifs, setReadNotifs] = useState<Set<string>>(new Set());
+  const [integrationError, setIntegrationError] = useState<{ title: string; message: string } | null>(null);
+
+  // After OAuth redirect: show Google Ads connection error if present in URL
+  useEffect(() => {
+    const reason = searchParams.get("google_ads_error");
+    const detail = searchParams.get("google_ads_error_detail");
+    if (reason || detail) {
+      setIntegrationError({
+        title: "Google Ads connection issue",
+        message: detail || (reason === "no_accounts" ? "No Google Ads accounts were found for this login." : reason === "missing_refresh_token" ? "Authorization was not fully granted. Try disconnecting and connecting again." : reason === "api_error" ? "We couldn't complete the connection. Please try again." : "Something went wrong while connecting Google Ads."),
+      });
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("google_ads_error");
+      params.delete("google_ads_error_detail");
+      const newUrl = params.toString() ? `/app?${params.toString()}` : "/app";
+      router.replace(newUrl);
+    }
+  }, [searchParams, router]);
 
   // Pending approval notifications (used for Tasks nav badge)
   const notifications = approvalTasks.map((t) => ({
@@ -3893,6 +4319,23 @@ function AppContent() {
 
     return (
       <div className="flex h-screen overflow-hidden" style={{ backgroundColor: "#f5f5f7" }}>
+        {/* Integration error popup (e.g. Google Ads connection failed) */}
+        {integrationError && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onClick={() => setIntegrationError(null)}>
+            <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-[18px] font-semibold text-black mb-2">{integrationError.title}</h3>
+              <p className="text-[14px] text-black leading-relaxed mb-6" style={{ opacity: 0.8 }}>{integrationError.message}</p>
+              <button
+                onClick={() => setIntegrationError(null)}
+                className="w-full py-2.5 rounded-xl text-[14px] font-semibold text-white transition-opacity hover:opacity-90"
+                style={{ backgroundColor: "#1d1d1f" }}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Mobile overlay - Hidden as menu is removed */}
         {sidebarOpen && (
           <div
