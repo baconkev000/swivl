@@ -1,6 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+
+/** Same as fetch but always sends cookies (needed for Django session on getswivl.ai). */
+const apiFetch = (input: RequestInfo | URL, init?: RequestInit) =>
+  fetch(input, { ...init, credentials: "include" });
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -592,13 +596,13 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
   useEffect(() => {
     const loadSeoGscStatus = async () => {
       try {
-        const res = await fetch("/api/integrations/google-search-console/status");
+        const res = await apiFetch("/api/integrations/google-search-console/status");
         if (!res.ok) return;
         const data = await res.json();
         const isConnected = typeof data.connected === "boolean" && data.connected;
         setSeoGscConnected(isConnected);
         if (isConnected) {
-          const metricsRes = await fetch("/api/seo/overview");
+          const metricsRes = await apiFetch("/api/seo/overview");
           if (metricsRes.ok) {
             const m = await metricsRes.json();
             setSeoMetrics({
@@ -621,13 +625,13 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
   useEffect(() => {
     const loadReviews = async () => {
       try {
-        const res = await fetch("/api/integrations/google-business-profile/status");
+        const res = await apiFetch("/api/integrations/google-business-profile/status");
         if (!res.ok) return;
         const data = await res.json();
         const gbpConnected = typeof data.connected === "boolean" && data.connected;
         setReviewsGbpConnected(gbpConnected);
         if (gbpConnected) {
-          const overviewRes = await fetch("/api/reviews/overview");
+          const overviewRes = await apiFetch("/api/reviews/overview");
           if (overviewRes.ok) {
             const o = await overviewRes.json();
             setReviewsOverview({
@@ -655,8 +659,8 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
     const loadAdditionalAdsStatus = async () => {
       try {
         const [metaRes, tiktokRes] = await Promise.all([
-          fetch("/api/integrations/meta-ads/status"),
-          fetch("/api/integrations/tiktok-ads/status"),
+          apiFetch("/api/integrations/meta-ads/status"),
+          apiFetch("/api/integrations/tiktok-ads/status"),
         ]);
 
         if (metaRes.ok) {
@@ -683,13 +687,13 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
   useEffect(() => {
     const loadAdsStatus = async () => {
       try {
-        const res = await fetch("/api/integrations/google-ads/status");
+        const res = await apiFetch("/api/integrations/google-ads/status");
         if (!res.ok) return;
         const data = await res.json();
         const isConnected = typeof data.connected === "boolean" && data.connected;
         setAdsGoogleConnected(isConnected);
         if (isConnected) {
-          const metricsRes = await fetch("/api/integrations/google-ads/metrics");
+          const metricsRes = await apiFetch("/api/integrations/google-ads/metrics");
           if (metricsRes.ok) {
             const m = await metricsRes.json();
             setAdsMetrics({
@@ -717,7 +721,7 @@ function DashboardView({ profile, onConnect, onOpenChat }: { profile: Profile | 
   useEffect(() => {
     const loadActivityFeed = async () => {
       try {
-        const res = await fetch("/api/activity");
+        const res = await apiFetch("/api/activity");
         if (!res.ok) return;
         const data = await res.json();
         if (Array.isArray(data.activities)) {
@@ -1118,7 +1122,7 @@ function IntegrationsView({ focusAgent }: { focusAgent?: string }) {
   useEffect(() => {
     const loadGscStatus = async () => {
       try {
-        const res = await fetch("/api/integrations/google-search-console/status");
+        const res = await apiFetch("/api/integrations/google-search-console/status");
         if (!res.ok) return;
         const data = await res.json();
         if (typeof data.connected === "boolean") {
@@ -1134,7 +1138,7 @@ function IntegrationsView({ focusAgent }: { focusAgent?: string }) {
 
     const loadAdsStatus = async () => {
       try {
-        const res = await fetch("/api/integrations/google-ads/status");
+        const res = await apiFetch("/api/integrations/google-ads/status");
         if (!res.ok) return;
         const data = await res.json();
         if (typeof data.connected === "boolean") {
@@ -1151,7 +1155,7 @@ function IntegrationsView({ focusAgent }: { focusAgent?: string }) {
 
     const loadGbpStatus = async () => {
       try {
-        const res = await fetch("/api/integrations/google-business-profile/status");
+        const res = await apiFetch("/api/integrations/google-business-profile/status");
         if (!res.ok) return;
         const data = await res.json();
         if (typeof data.connected === "boolean") {
@@ -1167,7 +1171,7 @@ function IntegrationsView({ focusAgent }: { focusAgent?: string }) {
 
     const loadMetaAdsStatus = async () => {
       try {
-        const res = await fetch("/api/integrations/meta-ads/status");
+        const res = await apiFetch("/api/integrations/meta-ads/status");
         if (!res.ok) return;
         const data = await res.json();
         if (typeof data.connected === "boolean") {
@@ -1183,7 +1187,7 @@ function IntegrationsView({ focusAgent }: { focusAgent?: string }) {
 
     const loadTiktokAdsStatus = async () => {
       try {
-        const res = await fetch("/api/integrations/tiktok-ads/status");
+        const res = await apiFetch("/api/integrations/tiktok-ads/status");
         if (!res.ok) return;
         const data = await res.json();
         if (typeof data.connected === "boolean") {
@@ -1685,7 +1689,7 @@ function SEOAgentOverview({
     const loadKeywords = async () => {
       setKeywordsLoading(true);
       try {
-        const res = await fetch("/api/seo/keywords");
+        const res = await apiFetch("/api/seo/keywords");
         if (!res.ok) return;
         const data = await res.json();
         if (Array.isArray(data.keywords)) {
@@ -2780,7 +2784,7 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
       if (agentName !== "seo") return;
       setSeoMetricsLoading(true);
       try {
-        const res = await fetch("/api/seo/overview");
+        const res = await apiFetch("/api/seo/overview");
         if (!res.ok) return;
         const m = await res.json();
         setSeoMetrics({
@@ -2804,7 +2808,7 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
       if (agentName !== "ads") return;
       setAdsMetricsLoading(true);
       try {
-        const res = await fetch("/api/integrations/google-ads/metrics");
+        const res = await apiFetch("/api/integrations/google-ads/metrics");
         if (!res.ok) return;
         const m = await res.json();
         setAdsMetrics({
@@ -2832,9 +2836,9 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
       if (agentName !== "ads") return;
       try {
         const [googleRes, metaRes, tiktokRes] = await Promise.all([
-          fetch("/api/integrations/google-ads/status"),
-          fetch("/api/integrations/meta-ads/status"),
-          fetch("/api/integrations/tiktok-ads/status"),
+          apiFetch("/api/integrations/google-ads/status"),
+          apiFetch("/api/integrations/meta-ads/status"),
+          apiFetch("/api/integrations/tiktok-ads/status"),
         ]);
 
         const parseBool = async (res: Response) => {
@@ -2895,7 +2899,7 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
     setRefreshing(true);
     try {
       if (agentName === "seo") {
-        const res = await fetch("/api/seo/overview?refresh=1");
+        const res = await apiFetch("/api/seo/overview?refresh=1");
         if (res.ok) {
           const m = await res.json();
           setSeoMetrics({
@@ -2907,7 +2911,7 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
           setAgentDataLastUpdated(new Date());
         }
       } else if (agentName === "ads") {
-        const res = await fetch("/api/integrations/google-ads/metrics?refresh=1");
+        const res = await apiFetch("/api/integrations/google-ads/metrics?refresh=1");
         if (res.ok) {
           const m = await res.json();
           setAdsMetrics({
@@ -2958,7 +2962,7 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
       const conversationId = currentThread?.conversationId ?? null;
 
       setTyping(true);
-      fetch("/api/seo/chat", {
+      apiFetch("/api/seo/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: t, conversation_id: conversationId }),
@@ -3004,7 +3008,7 @@ function AgentDetailView({ agentName, onBack, onGoIntegrations }: {
       const conversationId = currentThread?.conversationId ?? null;
 
       setTyping(true);
-      fetch("/api/reviews/chat", {
+      apiFetch("/api/reviews/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: t, conversation_id: conversationId }),
@@ -3523,7 +3527,7 @@ function SettingsView({
     setSaved(false);
     setSaveError(null);
     try {
-      const res = await fetch("/api/profile", {
+      const res = await apiFetch("/api/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -3541,7 +3545,7 @@ function SettingsView({
   const handleUpgrade = async (plan: string) => {
     setCheckoutLoading(true);
     try {
-      const res = await fetch("/api/checkout", {
+      const res = await apiFetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan }),
@@ -4224,13 +4228,13 @@ function AppContent() {
     async function loadData() {
       try {
         // Load subscription + base profile
-        const subRes = await fetch("/api/subscribe");
+        const subRes = await apiFetch("/api/subscribe");
         if (subRes.ok) {
           const data = await subRes.json();
           setSubscription(data.subscription);
         }
         // Load full business profile
-        const profRes = await fetch("/api/profile");
+        const profRes = await apiFetch("/api/profile");
         if (profRes.ok) {
           const data = await profRes.json();
           setProfile(data.profile);
@@ -4245,7 +4249,7 @@ function AppContent() {
     const checkoutSuccess = searchParams.get("checkout");
     const agents = searchParams.get("agents");
     if (checkoutSuccess === "success" && agents) {
-      fetch("/api/subscribe", {
+      apiFetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ agents }),
@@ -4257,7 +4261,7 @@ function AppContent() {
   }, [searchParams]);
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await apiFetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
   };
 
